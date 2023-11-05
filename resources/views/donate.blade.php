@@ -22,7 +22,7 @@
                                 </div>
                             </div>
                             <div class="donation-amount">
-                                <p class="fs-4 m-0 text-primary"><b>Rs 55,750.00</b></p>
+                                <p class="fs-4 m-0 text-primary"><b>$ {{ number_format($donate->price * $donate->count, 2, '.', ',') }}</b></p>
                             </div>
                         </div>
                     </div>
