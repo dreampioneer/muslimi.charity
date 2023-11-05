@@ -6,7 +6,7 @@
             <div class="col-md-6 pe-4">
                 <img src="assets/img/home.png" class="w-p100" alt="">
                 <div class="py-30 text-center">
-                    <a href="/donate" class="btn btn-custom btn-large">Donate Now</a>
+                    <a href="{{ route('home.donate') }}" class="btn btn-custom btn-large">Donate Now</a>
                 </div>
             </div>
             <div class="col-md-6 ps-4">

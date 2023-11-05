@@ -19,10 +19,10 @@ Route::name('home.')
     ->controller(HomeController::class)
     ->group(function () {
         Route::get('/', function () {
-            return redirect('home.index');
+            return redirect()->route('home.index');
         });
         Route::get('/home', 'index')->name('index');
-        Route::post('/donate', 'donate')->name('donate');
+        Route::get('/donate', 'donate')->name('donate');
     });
 
 Route::name('stripe.')
