@@ -3,22 +3,22 @@
     <div class="container">
       <div class="row gy-4">
         <div class="col-lg-3 col-md-12 footer-info">
-          <a href="index.html" class="logo d-flex align-items-center">
-            <span>MUSLIMI</span>
-          </a>
+            <div class="logo">
+                <img src="{{ asset('assets/img/madinah-poweredby.png') }}">
+            </div>
         </div>
 
         <div class="col-lg-3 col-6 footer-links">
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Careers</a></li>
+            <li><a href="https://madinah.com/about-us/">About Us</a></li>
+            <li><a href="https://madinah.com/marketing/">Marketing</a></li>
+            <li><a href="https://madinah.com/careers/">Careers</a></li>
           </ul>
         </div>
 
         <div class="col-lg-3 col-6 footer-links">
-          <p>Email: support@madinah.com</p>
-          <p>Phone: (833) 562-3462</p>
+          <p>Email: <a class="custom" href="mailto:support@madinah.com" target="_blank">support@madinah.com</a></p>
+          <p>Phone: <a class="custom" href="tel:8335623462">(833) 562-3462</a></p>
           <p>Address: 7030 Woodbine Ave Suite 500,Markham, ON, Canada, L3R6G2</p>
         </div>
 
