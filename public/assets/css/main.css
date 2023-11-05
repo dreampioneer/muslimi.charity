@@ -2564,7 +2564,7 @@ section {
 
 .footer .footer-info .logo {
   line-height: 0;
-  margin-bottom: 25px;
+  margin-top: 35px;
 }
 
 .footer .footer-info .logo img {
@@ -2590,10 +2590,6 @@ section {
   font-weight: bold;
   position: relative;
   padding-bottom: 12px;
-}
-
-.footer .footer-links {
-  margin-bottom: 30px;
 }
 
 .footer .footer-links ul {
@@ -2656,6 +2652,10 @@ section {
     max-width: 480px;
 }
 
+.w-35{
+    width: 35px;
+}
+
 .w-p100{
     width: 100%;
 }
@@ -2668,8 +2668,8 @@ section {
 }
 
 .btn-custom:hover,.btn-custom:active{
-    background: var(--color-primary);
-    color: #FFF;
+    background: var(--color-primary) !important;
+    color: #FFF !important;
 }
 
 .btn-large{
@@ -2684,6 +2684,14 @@ section {
     border-radius: 67px;
 }
 
+a.primary{
+    color: #000 !important;
+}
+
+a.primary:hover,a.primary:active{
+    color: var(--color-primary) !important;
+}
+
 .bg-slide{
     background-color: #f3f3f3;
     padding: 0px !important;
@@ -2696,6 +2704,19 @@ section {
 .pull-right{
     float: right;
 }
+
+.text-right{
+    text-align: right;
+}
+
+.dot {
+    height: 7px;
+    width: 7px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+  }
 
 .carousel-item .row{
     height: 600px;
@@ -3005,4 +3026,14 @@ section {
 .others .other-img{
     width: 117.143px;
     margin: auto 50px auto 0px;
+}
+
+.recent-donation{
+    border-radius: 20px;
+}
+
+.card-form{
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
 }

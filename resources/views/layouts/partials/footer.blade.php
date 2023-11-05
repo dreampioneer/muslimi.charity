@@ -9,36 +9,21 @@
         </div>
 
         <div class="col-lg-3 col-6 footer-links">
-          <h4>Useful Links</h4>
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Terms of service</a></li>
-            <li><a href="#">Privacy policy</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-3 col-6 footer-links">
-          <h4>Our Services</h4>
-          <ul>
-            <li><a href="#">Web Design</a></li>
-            <li><a href="#">Web Development</a></li>
-            <li><a href="#">Product Management</a></li>
+            <li><a href="#">About Us</a></li>
             <li><a href="#">Marketing</a></li>
-            <li><a href="#">Graphic Design</a></li>
+            <li><a href="#">Careers</a></li>
           </ul>
         </div>
 
         <div class="col-lg-3 col-6 footer-links">
-            <h4>Our Services</h4>
-            <ul>
-              <li><a href="#">Web Design</a></li>
-              <li><a href="#">Web Development</a></li>
-              <li><a href="#">Product Management</a></li>
-              <li><a href="#">Marketing</a></li>
-              <li><a href="#">Graphic Design</a></li>
-            </ul>
+          <p>Email: support@madinah.com</p>
+          <p>Phone: (833) 562-3462</p>
+          <p>Address: 7030 Woodbine Ave Suite 500,Markham, ON, Canada, L3R6G2</p>
+        </div>
+
+        <div class="col-lg-3 col-6 footer-links">
+            <p class="fs-6">This website is not part of the Facebook website or Facebook Inc. Additionally, this site is not endorsed by Facebook in any way. Facebook is a trademark of Facebook, Inc.</p>
           </div>
       </div>
     </div>

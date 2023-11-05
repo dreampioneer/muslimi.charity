@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::name('home.')
+    ->controller(HomeController::class)
+    ->group(function () {
+        Route::get('/', function () {
+            return redirect('home.index');
+        });
+        Route::get('/home', 'index')->name('index');
+        Route::post('/donate', 'donate')->name('donate');
+    });
+
+Route::name('stripe.')
+    ->controller(PaymentController::class)
+    ->prefix('stripe')
+    ->group(function () {
+        Route::get('/payment', 'index')->name('index');
+        Route::post('/payment', 'store')->name('store');
+    });
+
