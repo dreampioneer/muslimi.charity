@@ -17,7 +17,7 @@
         </div>
 
         <div class="col-lg-3 col-6 footer-links">
-          <p>Email: <a class="custom" href="mailto:support@madinah.com" target="_blank">support@madinah.com</a></p>
+          <p>Email: <a class="custom" href="mailto:info@muslimi.charity" target="_blank">info@muslimi.charity</a></p>
           <p>Phone: <a class="custom" href="tel:8335623462">(833) 562-3462</a></p>
           <p>Address: 7030 Woodbine Ave Suite 500,Markham, ON, Canada, L3R6G2</p>
         </div>
