@@ -33,108 +33,84 @@
 <section class="bg-slide">
     <div id="carouselExampleRide" class="carousel carousel-dark slide" data-bs-ride="true">
         <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6 col-sm-12 align-self-center">
-                        <h2 class="slide-title">
-                            <a class="primary" href="https://madinah.com/feed-a-life-campaign/">Feed A Life Campaign</a>
-                        </h2>
-                        <p class="slide-intro">We’re on the ground delivering LIFESAVING aid to over 6 million refugees living through war. They’re crying out for your help </p>
-                        <div class="slide-timeline">
-                            <ul>
-                                <li>
-                                    <span class="">
-                                        <bdi>
-                                            <span class="">$</span>
-                                            26,092.76
-                                        </bdi>
-                                    </span>
-                                    <span class="price">Raised
-                                    </span>
-                                </li>
-                                <li>
-                                    <span class="">
-                                        <bdi>
-                                            <span class="">$</span>
-                                            50,000.00
-                                        </bdi>
-                                    </span>
-                                    <span class="price">Goal</span>
-                                </li>
-                                <li>
-                                    <span>0</span>
-                                    <span class="info-text">Days to go</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="slide-progress-bar">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-primary six-sec-ease-in-out" role="progressbar" data-valuetransitiongoal="52.19" style="width:52.19%;">
+            @php
+                $carousels = [
+                    [
+                        'title' => 'Feed A Life Campaign',
+                        'body' => 'We’re on the ground delivering LIFESAVING aid to over 6 million refugees living through war. They’re crying out for your help',
+                        'raised' => '26,519.76',
+                        'goal' => '50,000.00',
+                        'days' => '0',
+                        'percent' => '53.04',
+                        'href' => 'https://madinah.com/feed-a-life-campaign/',
+                        'imgUrl' => 'https://madinah.com/wp-content/uploads/2022/05/project-70791-body-1-1.jpg',
+                    ],
+                    [
+                        'title' => 'Help Them Survive the Cold!',
+                        'body' => 'Winter is here. Millions of refugees across the world aren’t sure whether they’ll make it to see the next year.',
+                        'raised' => '8,889.67',
+                        'goal' => '10,000.00',
+                        'days' => '0',
+                        'percent' => '88.90',
+                        'href' => 'https://madinah.com/help-them-survive-the-cold/',
+                        'imgUrl' => 'https://madinah.com/wp-content/uploads/2022/02/HCI-Winter-600x500-1.jpg',
+                    ]
+                ];
+            @endphp
+            @foreach ($carousels as $index => $carousel)
+                <div class="carousel-item @if(!$index) active @endif">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 col-sm-12 align-self-center">
+                                <h2 class="slide-title">
+                                    <a class="primary" href="{{ $carousel['href'] }}">{{ $carousel['title'] }}</a>
+                                </h2>
+                                <p class="slide-intro">{{ $carousel['body'] }}</p>
+                                <div class="slide-timeline">
+                                    <ul>
+                                        <li>
+                                            <span class="">
+                                                <bdi>
+                                                    <span class="">$</span>
+                                                    {{ $carousel['raised'] }}
+                                                </bdi>
+                                            </span>
+                                            <span class="price">Raised
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <span class="">
+                                                <bdi>
+                                                    <span class="">$</span>
+                                                    {{ $carousel['goal'] }}
+                                                </bdi>
+                                            </span>
+                                            <span class="price">Goal</span>
+                                        </li>
+                                        <li>
+                                            <span>{{ $carousel['days'] }}</span>
+                                            <span class="info-text">Days to go</span>
+                                        </li>
+                                    </ul>
                                 </div>
+                                <div class="slide-progress-bar">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary six-sec-ease-in-out" role="progressbar" data-valuetransitiongoal="{{ $carousel['percent'] }}" style="width:{{ $carousel['percent'] }}%;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ $carousel['href'] }}" class="btn btn-custom btn-normal">
+                                    Donate Now
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <img src="{{ $carousel['imgUrl'] }}" class="img-fluid">
                             </div>
                         </div>
-                        <a class="btn btn-custom btn-normal">
-                            Donate Now
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <img src="https://madinah.com/wp-content/uploads/2022/05/project-70791-body-1-1.jpg" class="img-fluid">
                     </div>
                 </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6 col-sm-12 align-self-center">
-                        <h2 class="slide-title">
-                            <a href="https://madinah.com/feed-a-life-campaign/">Feed A Life Campaign</a>
-                        </h2>
-                        <p class="slide-intro">We’re on the ground delivering LIFESAVING aid to over 6 million refugees living through war. They’re crying out for your help </p>
-                        <div class="slide-timeline">
-                            <ul>
-                                <li>
-                                    <span class="">
-                                        <bdi>
-                                            <span class="">$</span>
-                                            26,092.76
-                                        </bdi>
-                                    </span>
-                                    <span class="price">Raised
-                                    </span>
-                                </li>
-                                <li>
-                                    <span class="">
-                                        <bdi>
-                                            <span class="">$</span>
-                                            50,000.00
-                                        </bdi>
-                                    </span>
-                                    <span class="price">Goal</span>
-                                </li>
-                                <li>
-                                    <span>0</span>
-                                    <span class="info-text">Days to go</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="slide-progress-bar">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-primary six-sec-ease-in-out" role="progressbar" data-valuetransitiongoal="52.19" style="width:52.19%;">
-                                </div>
-                            </div>
-                        </div>
-                        <a class="btn btn-custom btn-normal">
-                            Donate Now
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <img src="https://madinah.com/wp-content/uploads/2022/05/project-70791-body-1-1.jpg" class="img-fluid">
-                    </div>
-                </div>
-            </div>
-          </div>
+            @endforeach
+
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
