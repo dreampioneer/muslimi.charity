@@ -145,6 +145,55 @@
                             </div>
                         @endforeach
                     </div>
+                    <div class="bill-detial">
+                        <h5 class="mb-3 fw-bold">Your Details</h5>
+                        <div class="row my-4">
+                            <div class="col-md-6">
+                                <div class="">
+                                    <label for="" class="form-label">First Name&nbsp;<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name" value="{{ old('first_name') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="">
+                                    <label for="" class="form-label">Last Name&nbsp;<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name" value="{{ old('last_name') }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-4">
+                            <div class="">
+                                <label for="" class="form-label">Email Address&nbsp;<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="email" name="email" placeholder="Email Address" value="{{ old('email') }}">
+                            </div>
+                        </div>
+                        <div class="row my-4">
+                            <div class="">
+                                <label for="" class="form-label">Phone (optional)</label>
+                                <input type="text" class="form-control" id="phone-number" name="phone_number" placeholder="Phone Number" value="{{ old('phone_number') }}">
+                            </div>
+                        </div>
+                        <div class="row my-4">
+                            <div class="">
+                                <label for="" class="form-label">Card Number&nbsp;<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="card-number" name="card_number" placeholder="Card Number"  value="{{ old('card_number') }}">
+                            </div>
+                        </div>
+                        <div class="row my-4">
+                            <div class="col-md-6">
+                                <div class="">
+                                    <label for="" class="form-label">Expirey Date&nbsp;<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="expirey-date" name="expirey_date" placeholder="Expirey Date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="">
+                                    <label for="" class="form-label">CVV&nbsp;<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cvc" name="cvc" placeholder="CVV">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="donate-detail-div">
                         <h5 class="mb-3 fw-bold">Your Donations</h5>
                         <div class="donate-detail">
@@ -160,54 +209,7 @@
                                 <label class="form-check-label" for="is_zakat">&nbsp;&nbsp;This donation is Zakat (Optional)</label>
                             </div>
                         </div>
-                        <div class="bill-detial">
-                            <div class="row my-4">
-                                <div class="col-md-6">
-                                    <div class="">
-                                        <label for="" class="form-label">First Name&nbsp;<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name" value="{{ old('first_name') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="">
-                                        <label for="" class="form-label">Last Name&nbsp;<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name" value="{{ old('last_name') }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row my-4">
-                                <div class="">
-                                    <label for="" class="form-label">Email Address&nbsp;<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="email" name="email" placeholder="Email Address" value="{{ old('email') }}">
-                                </div>
-                            </div>
-                            <div class="row my-4">
-                                <div class="">
-                                    <label for="" class="form-label">Phone (optional)</label>
-                                    <input type="text" class="form-control" id="phone-number" name="phone_number" placeholder="Phone Number" value="{{ old('phone_number') }}">
-                                </div>
-                            </div>
-                            <div class="row my-4">
-                                <div class="">
-                                    <label for="" class="form-label">Card Number&nbsp;<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="card-number" name="card_number" placeholder="Card Number"  value="{{ old('card_number') }}">
-                                </div>
-                            </div>
-                            <div class="row my-4">
-                                <div class="col-md-6">
-                                    <div class="">
-                                        <label for="" class="form-label">Expirey Date&nbsp;<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="expirey-date" name="expirey_date" placeholder="Expirey Date">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="">
-                                        <label for="" class="form-label">CVC&nbsp;<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="cvc" name="cvc" placeholder="CVC">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="w-p100">
                         <button class="btn btn-custom btn-normal w-p100 btn-donate">
@@ -471,7 +473,7 @@
             });
             Toast.fire({
                 icon: 'error',
-                title: "Please select the product!",
+                title: "Please select donation amount!",
             });
             return;
         }
@@ -598,7 +600,7 @@
 
     function validateCVC(cvcNum){
         if (!Stripe.card.validateCVC(cvcNum)) {
-            reportError('cvc', 'The CVC number appears to be invalid.');
+            reportError('cvc', 'The CVV number appears to be invalid.');
         }else{
             reportSuccess('cvc');
         }
