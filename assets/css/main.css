@@ -290,7 +290,7 @@ section {
 .header {
   transition: all 0.5s;
   z-index: 997;
-  height: 90px;
+  height: 70px;
 }
 
 .header.sticked {
@@ -303,7 +303,7 @@ section {
 }
 
 .header .logo img {
-  max-height: 40px;
+  max-height: 35px;
   margin-right: 6px;
 }
 

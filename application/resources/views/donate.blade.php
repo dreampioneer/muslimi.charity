@@ -1,11 +1,11 @@
 @extends('layouts.layouts')
 @section('content')
-<section>
+<section class="py-30">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <h4 class="mb-2 fw-bold">YOUR  DONATEION IS ZAKAT-ELIGIBLE</h4>
-                <h5 class="mb-2 fw-semibold">Recent donations</h5>
+                <h5 class="mb-2 fw-bold">YOUR  DONATEION IS ZAKAT-ELIGIBLE</h5>
+                <h6 class="mb-2 fw-semibold">Recent donations</h6>
                 @foreach ($donates as $donate)
                     <div class="border border-secondary-subtle border-1 px-4 py-3 recent-donation mb-3">
                         <div class="d-flex justify-content-between">
@@ -109,12 +109,12 @@
             <div class="col-md-8">
                 <div class="donate-div">
                     <div class="donate-item-div">
-                        <h4 class="mb-25 fw-bold">How much do you want to donate? Please select exact donation amount below.</h4>
+                        <h5 class="mb-25 fw-bold">How much do you want to donate? Please select exact donation amount below.</h5>
                         @foreach ($donates as $donate)
                             <div class="border border-secondary-subtle border-1 px-3 mb-25">
                                 <div class="d-flex donate-title ps-2">
-                                    <input class="form-check-input fs-4 my-auto" type="checkbox" name="{{ $donate['class'] }}_checkbox">
-                                    <h4 class="my-auto fw-semibold">&nbsp;&nbsp;{{ $donate['title'] }}</h4>
+                                    <input class="form-check-input fs-5 my-auto" type="checkbox" name="{{ $donate['class'] }}_checkbox">
+                                    <h5 class="my-auto fw-semibold">&nbsp;&nbsp;{{ $donate['title'] }}</h5>
                                 </div>
                                 @foreach ($donate['donateItems'] as $index => $donateItem)
                                     @if(!$index)
@@ -146,7 +146,7 @@
                         @endforeach
                     </div>
                     <div class="donate-detail-div">
-                        <h4 class="mb-3 fw-bold">Your Donations</h4>
+                        <h5 class="mb-3 fw-bold">Your Donations</h5>
                         <div class="donate-detail">
 
                         </div>
