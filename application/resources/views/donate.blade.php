@@ -146,7 +146,7 @@
                         @endforeach
                     </div>
                     <div class="bill-detial">
-                        <h5 class="mb-3 fw-bold">Your Details</h5>
+                        <h5 class="pb-3 fw-bold border-bottom border-1">Your Details</h5>
                         <div class="row my-4">
                             <div class="col-md-6">
                                 <div class="">
