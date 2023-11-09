@@ -150,12 +150,14 @@
                         <div class="donate-detail">
 
                         </div>
-                        <div class="row pb-4">
-                            <div class="col-md-12">
-                                <div class="">
-                                    <label for="" class="form-label">Dedicate this donation (Optional)</label>
-                                    <input type="text" class="form-control" id="dedicate-this-donation" name="dedicate_this_donation" placeholder="Name of someone special" value="">
-                                </div>
+                        <div class="row">
+                            <div class="col-md-12 pb-4">
+                                <label for="" class="form-label">Dedicate this donation (Optional)</label>
+                                <input type="text" class="form-control" id="dedicate-this-donation" name="dedicate_this_donation" placeholder="Name of someone special" value="">
+                            </div>
+                            <div class="col-md-12 pb-4">
+                                <input type="checkbox" class="form-check-input" id="is_zakat">
+                                <label class="form-check-label" for="is_zakat">&nbsp;&nbsp;This donation is Zakat (Optional)</label>
                             </div>
                         </div>
                         <div class="bill-detial">
@@ -203,12 +205,6 @@
                                         <label for="" class="form-label">CVC&nbsp;<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="cvc" name="cvc" placeholder="CVC">
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row my-4">
-                                <div class="col-md-12">
-                                    <input type="checkbox" class="form-check-input" id="is_zakat">
-                                    <label class="form-check-label" for="is_zakat">This donation is Zakat (Optional)</label>
                                 </div>
                             </div>
                         </div>
