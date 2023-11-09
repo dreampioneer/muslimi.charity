@@ -261,6 +261,7 @@
 @endsection
 @section('script')
     <script src="{{ asset('assets/vendor/jquery.mask.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/jquery.inputmask.min.js') }}"></script>
     <script src="https://js.stripe.com/v2/"></script>
     <script type="text/javascript">
     Stripe.setPublishableKey('{{ env("STRIPE_KEY") }}');
@@ -339,7 +340,7 @@
                                 '<div class="col-md-3 d-flex ps-36">' +
                                     '<div class="input-group my-auto">' +
                                         '<button class="btn btn-outline-secondary btn-sub w-35" type="button" data-id="' + i + '" data-amount="' + parseInt(donates[i]['donate_amount']) + '">-</button>' +
-                                        '<input type="number" class="form-control text-center qty-' + i + '" min="1" value="' + parseInt(donates[i]['donate_count']) + '">' +
+                                        '<input type="number" class="form-control text-center qty-' + i + '" min="1" value="' + parseInt(donates[i]['donate_count']) + '" data-id="' + i + '" data-amount="' + parseInt(donates[i]['donate_amount']) + '">' +
                                         '<button class="btn btn-outline-secondary btn-add w-35" type="button" data-id="' + i + '" data-amount="' + parseInt(donates[i]['donate_amount']) + '">+</button>' +
                                     '</div>' +
                                 '</div>' +
@@ -363,7 +364,53 @@
                         '</div>' +
                     '</div>';
         $(".donate-detail").html(html);
+        $(".donate-detail input[type=number]").inputmask('Regex', { regex: "^[1-9][0-9]?$|^100000000000$" });
     }
+
+    $(".donate-detail").on('keydown', 'input[type=number]', function(event){
+        if ($.inArray(event.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            // Allow Ctrl+A
+            (event.keyCode == 65 && event.ctrlKey === true) ||
+            // Allow Ctrl+C
+            (event.keyCode == 67 && event.ctrlKey === true) ||
+            // Allow Ctrl+V
+            (event.keyCode == 86 && event.ctrlKey === true) ||
+            // Allow Ctrl+X
+            (event.keyCode == 88 && event.ctrlKey === true) ||
+            // Allow home, end, left, right keys
+            (event.keyCode >= 35 && event.keyCode <= 39)) {
+            // Let it happen, don't do anything
+            return;
+        }
+
+        // Ensure that it is a number and greater than zero, prevent the keypress if it's not
+        if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) || parseInt($(this).val() + event.key) <= 0) {
+            event.preventDefault();
+        }
+    })
+
+    $(".donate-detail").on('change', 'input[type=number]', function(e){
+        if(e.target.value == '' || e.target.value == 0){
+            e.target.value = 1;
+        }
+        let index = $(this).attr('data-id');
+        let amount = $(this).attr('data-amount');
+        let value = e.target.value;
+        amount = parseInt(amount);
+        let subTotal = amount * value;
+        subTotal = subTotal.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+        $('.total-' + index).text("$ " + subTotal);
+        donates[index]['donate_count'] = value;
+        let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(item['donate_amount']), 0);
+        totalAmount = totalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+        $('.total').text('$ ' + totalAmount);
+    });
 
     $(".donate-div").on('click', '.btn-add', function(){
         let index = $(this).attr('data-id');
@@ -453,6 +500,7 @@
                 return;
             }
         }
+        $("html, body").animate({ scrollTop: 0 }, "fast");
         flag = !flag;
     })
 
@@ -466,6 +514,7 @@
             $(".bill-detial").hide();
             $(".btn-cancel").hide();
         }
+        $("html, body").animate({ scrollTop: 0 }, "fast");
         flag = !flag;
     })
 
@@ -503,7 +552,7 @@
 
     function validateRequired(selector, value){
         if (!value.length) {
-            reportError(selector, 'The ' + selector.replace('-', '') + ' appears to be invalid.');
+            reportError(selector, 'The ' + selector.replace('-', ' ') + ' appears to be invalid.');
         }else{
             reportSuccess(selector);
         }
