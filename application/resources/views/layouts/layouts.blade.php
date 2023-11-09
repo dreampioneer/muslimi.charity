@@ -8,7 +8,7 @@
   <title>MUSLIMI</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <!-- Favicons -->
   <link href="{{ asset('assets/img/m-blue-logo.png') }}" rel="icon">
 
@@ -23,7 +23,7 @@
   <link href="{{ asset('assets/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
+  <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.css') }}"></script>
   <!-- Template Main CSS File -->
   <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
   @yield('style')
@@ -45,7 +45,35 @@
     <script src="{{ asset('assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/php-email-form/validate.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery.cookie.js') }}"></script>
+    <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script type="text/javascript">
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            error: function(xhr){
+                alert("Something went wrong. Please try again!");
+            }
+        });
+        @if(Session::has('success'))
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: 'success',
+                title: "{!! session('success') !!}",
+            });
+        @endif
+    </script>
     @yield('script')
 </body>
 

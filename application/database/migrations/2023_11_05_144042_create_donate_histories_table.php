@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email');
-            $table->string('phone');
-            $table->string('product_name');
-            $table->integer('count');
+            $table->string('phone')->nullable();
             $table->float('price');
             $table->string('transaction_id');
+            $table->string('dedicate_this_donation')->nullable();
+            $table->boolean('is_zakat')->nullable();
             $table->timestamps();
         });
     }

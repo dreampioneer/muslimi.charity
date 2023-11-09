@@ -8,7 +8,7 @@
       </a>
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="{{ route('home.index') }}" class="primary">Home</a></li>
+          <li><a href="{{ route('home.index') }}" class="primary active">Home</a></li>
         </ul>
       </nav><!-- .navbar -->
 {{--

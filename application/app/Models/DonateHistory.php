@@ -14,9 +14,9 @@ class DonateHistory extends Model
         'last_name',
         'email',
         'phone',
-        'product_name',
-        'count',
         'price',
         'transaction_id',
+        'dedicate_this_donation',
+        'is_zakat'
     ];
 }
