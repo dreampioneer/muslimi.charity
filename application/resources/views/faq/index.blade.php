@@ -51,11 +51,11 @@
                         ],
                         [
                             "subtitle" => "Why was my credit card declined?",
-                            "subcontent" => "Credit card companies and banks decline cards for many reasons. To ensure your financial information remains secure, ShareTheMeal does not receive details about why your card was declined. Unfortunately, this means we cannot resolve the problem for you. If your card is declined, please contact your credit card company or bank for help completing your payment."
+                            "subcontent" => "Credit card companies and banks decline cards for many reasons. To ensure your financial information remains secure, MUSLIMI does not receive details about why your card was declined. Unfortunately, this means we cannot resolve the problem for you. If your card is declined, please contact your credit card company or bank for help completing your payment."
                         ],
                         [
                             "subtitle" => "Why is a second confirmation step necessary for some donations?",
-                            "subcontent" => "Some card issuers may request additional steps to verify your identity. These steps depend on your bank and may include fingerprint, text message or an additional password. The ShareTheMeal app will help you navigate through these steps."
+                            "subcontent" => "Some card issuers may request additional steps to verify your identity. These steps depend on your bank and may include fingerprint, text message or an additional password. The MUSLIMI app will help you navigate through these steps."
                         ],
                     ]
                 ]
