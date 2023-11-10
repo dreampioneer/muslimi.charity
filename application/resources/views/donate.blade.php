@@ -45,40 +45,48 @@
             @php
                 $donateFoods = [
                     [
+                        'priceId' => 'price_1OAvfgCJAyesaXH9OhRu0Dej',
                         'donate_name' => "Supply a family with a month's supply of Hot Meal",
                         'amount' => 56,
                     ],
                     [
+                        'priceId' => 'price_1OAvfwCJAyesaXH9eytfjz4b',
                         'donate_name' => "Supply 2 families with a month's supply of Hot Meals",
                         'amount' => 112,
                     ],
                     [
+                        'priceId' => 'price_1OAvgDCJAyesaXH92YF54Gi2',
                         'donate_name' => "Supply 5 families with a month's supply of Hot Meals",
                         'amount' => 280,
                     ],
                     [
+                        'priceId' => 'price_1OAoEWCJAyesaXH9JerRyR1b',
                         'donate_name' => "Supply 10 families with a month's supply of Hot Meals",
                         'amount' => 560,
                     ],
                     [
+                        'priceId' => 'price_1OAvgoCJAyesaXH91fXJGDYz',
                         'donate_name' => "Supply 20 families with a month's supply of Hot Meals",
                         'amount' => 1120,
                     ],
                 ];
                 $donateMedicalSupplies = [
                     [
+                        'priceId' => 'price_1OAvh3CJAyesaXH9ZFnDI3J1',
                         'donate_name' => "Emergency Medical Supplies to Hospitals",
                         'amount' => 200,
                     ]
                 ];
                 $donateShelter = [
                     [
+                        'priceId' => 'price_1OAvhgCJAyesaXH9OO9kkC8a',
                         'donate_name' => "Emergency Shelter",
                         'amount' => 500,
                     ]
                 ];
                 $donateAidCombo = [
                     [
+                        'priceId' => 'price_1OAvhuCJAyesaXH93yooc4hs',
                         'donate_name' => "Emergency Aid Combo (Meals, Water, Aid, Shelter)",
                         'amount' => 1000,
                     ]
@@ -131,7 +139,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <p class="fs-6 mb-0">
-                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;${{  number_format($donateItem["amount"], 2, '.', ',')}}
+                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-price-id="{{ $donateItem["priceId"] }}" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;${{  number_format($donateItem["amount"], 2, '.', ',')}}
                                                 </p>
                                             </div>
                                             <div class="col-md-8">
@@ -201,6 +209,10 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 pb-4">
+                                <input type="checkbox" class="form-check-input" id="is_monthly">
+                                <label class="form-check-label" for="is_monthly">&nbsp;&nbsp;Give this amount monthly (Optional)</label>
+                            </div>
+                            <div class="col-md-12 pb-4">
                                 <label for="" class="form-label">Dedicate this donation (Optional)</label>
                                 <input type="text" class="form-control" id="dedicate-this-donation" name="dedicate_this_donation" placeholder="Name of someone special" value="">
                             </div>
@@ -261,8 +273,10 @@
     <script src="{{ asset('assets/vendor/jquery.mask.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery.inputmask.min.js') }}"></script>
     <script src="https://js.stripe.com/v2/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript">
     Stripe.setPublishableKey('{{ env("STRIPE_KEY") }}');
+    const stripe = Stripe('pk_test_VOOyyYjgzqdm8I3SrBqmh9qY');
     var flag = true;
     $(document).ready(function(){
         $(".donate-detail-div").hide();
@@ -283,6 +297,7 @@
             $('input[name=' + radioName + ']').eq(0).prop('checked', true);
             donates.push(
                 {
+                    'donate_price_id': $('input[name=' + radioName + ']').eq(0).attr('data-price-id'),
                     'donate_name': $('input[name=' + radioName + ']').eq(0).attr('data-name'),
                     'donate_amount': parseFloat($('input[name=' + radioName + ']').eq(0).attr('data-amount')),
                     'donate_count': 1
@@ -634,6 +649,7 @@
             let phone_number = $('#phone-number').val();
             let dedicate_this_donation = $('#dedicate-this-donation').val();
             let is_zakat = $('#is_zakat').prop('checked');
+            let is_monthly = $('#is_monthly').prop('checked');
             $.ajax({
                 url: "{{ route('stripe.store') }}",
                 method: 'POST',
@@ -648,10 +664,34 @@
                     phone_number,
                     dedicate_this_donation,
                     is_zakat,
-                    donates
+                    donates,
+                    is_monthly
                 },
                 success: function(res){
                     if(res.status == 'success'){
+                        if(res.payMethod == 'subscription'){
+                            console.log('here');
+                            stripe.retrievePaymentIntent(res.clientSecret).then(({paymentIntent}) => {
+                                switch (paymentIntent.status) {
+                                    case 'succeeded':
+                                        console.log('Success! Payment received.');
+                                    break;
+
+                                    case 'processing':
+                                        console.log("Payment processing. We'll update you when payment is received.");
+                                    break;
+
+                                    case 'requires_payment_method':
+                                        console.log('Payment failed. Please try another payment method.');
+                                    break;
+
+                                    default:
+                                        console.log('Something went wrong.');
+                                    break;
+                                }
+                            });
+                        }
+                        if(res.payMethod == 'onetime')
                         window.location.href = window.location.href;
                     }else{
                         const Toast = Swal.mixin({

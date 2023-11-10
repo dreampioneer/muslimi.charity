@@ -10,6 +10,7 @@ use Stripe\Exception\CardException;
 use Stripe\StripeClient;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
+
 class PaymentController extends Controller
 {
     public function index()
@@ -28,23 +29,42 @@ class PaymentController extends Controller
             'last_name' => ['required', 'max:255'],
             'email' => ['required', 'email'],
             'donates' => ['required', 'array', 'min:1'],
-            'dedicate_this_donation' => ['max:255'],
+            'dedicate_this_donation' => ['max:40000'],
             // 'is_zakat' => ['boolean'],
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return back()->withErrors($validate->errors())->withInput();
         }
 
         try {
+            $email = $request->email;
+            $firstName = $request->first_name;
+            $lastName = $request->last_name;
             $stripe = new StripeClient(env('STRIPE_SECRET'));
-            $customer = $stripe->customers->create(
-                [
-                    "email" => $request->email,
-                    "name" => $request->first_name . " " . $request->last_name,
-                    "source" => $request->stripeToken
-                ]
-            );
+
+            $customers = $stripe->customers->all([
+                "limit" => 100,
+                "email" => $email,
+            ]);
+
+            foreach ($customers->autoPagingIterator() as $customer) {
+                if ($customer->metadata->first_name == $firstName && $customer->metadata->last_name == $lastName) {
+                    $customerId = $customer->id;
+                    break;
+                }
+            }
+            if (isset($customerId)) {
+                $customer = $stripe->customers->retrieve($customerId);
+            } else {
+                $customer = $stripe->customers->create(
+                    [
+                        "email" => $request->email,
+                        "name" => $request->first_name . " " . $request->last_name,
+                        "source" => $request->stripeToken
+                    ]
+                );
+            }
 
             $total = 0;
 
@@ -53,12 +73,50 @@ class PaymentController extends Controller
                 $total += $subtotal;
             }
 
-            $result = $stripe->charges->create([
-                "amount" => $total * 100,
-                "currency" => "usd",
-                "customer" => $customer->id,
-                "description" => "Donate",
-            ]);
+            if ($request->is_monthly == 'true') {
+                $items = [];
+                foreach ($request->donates as $donate) {
+                    array_push($items, [
+                        'price' => $donate['donate_price_id'],
+                        'quantity' => intval($donate['donate_count'])
+                    ]);
+                }
+
+                $result = $stripe->subscriptions->create([
+                    'customer' => $customer->id,
+                    'items' => $items,
+                    'payment_behavior' => 'default_incomplete',
+                    'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
+                    'expand' => ['latest_invoice.payment_intent'],
+                    "description" => $request->dedicate_this_donation ? $request->dedicate_this_donation . "(Double-Time Donate)" : "Double-Time Donate",
+                ]);
+
+                $invoice = $stripe->invoices->pay($result->latest_invoice->id, [
+                    "source" => $customer->default_source
+                ]);
+
+                // $data = [
+                //     'status' => 'success',
+                //     'payMethod' => 'subscription',
+                //     'subscriptionId' => $result->id,
+                //     'clientSecret' => $result->latest_invoice->payment_intent->client_secret,
+                //     'customerId' => $customer->id
+                // ];
+            } else {
+
+                $result = $stripe->charges->create([
+                    "amount" => $total * 100,
+                    "currency" => "usd",
+                    "customer" => $customer->id,
+                    "description" => $request->dedicate_this_donation ? $request->dedicate_this_donation . "(One-Time Donate)" : "One-Time Donate",
+                ]);
+
+                // $data = [
+                //     'payMethod' => 'onetime',
+                //     'status' => 'success',
+                //     'msg' => '',
+                // ];
+            }
 
             $donateHistory = DonateHistory::create([
                 'first_name' => $request->first_name,
@@ -66,7 +124,8 @@ class PaymentController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone_number,
                 'dedicate_this_donation' => $request->dedicate_this_donation,
-                'is_zakat' => $request->is_zakat == 'true' ? 1: 0,
+                'is_zakat' => $request->is_zakat == 'true' ? 1 : 0,
+                'is_monthly' => $request->is_monthly == 'true' ? 1 : 0,
                 'price' => $total,
                 'transaction_id' => $result->id,
             ]);
@@ -81,7 +140,8 @@ class PaymentController extends Controller
             }
 
             $request->session()->flash('success', 'You have donated successfully!');
-            return response()->json(['status' => 'success', 'msg' => '']);
+
+            return response()->json($data);
         } catch (CardException $th) {
             return response()->json(['status' => 'error', 'msg' => $th->getMessage()]);
         }
