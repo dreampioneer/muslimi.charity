@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('transaction_id');
             $table->string('dedicate_this_donation')->nullable();
             $table->boolean('is_zakat')->nullable();
+            $table->boolean('is_monthly')->nullable();
             $table->timestamps();
         });
     }
