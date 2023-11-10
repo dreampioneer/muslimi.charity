@@ -679,30 +679,7 @@
                 },
                 success: function(res){
                     if(res.status == 'success'){
-                        if(res.payMethod == 'subscription'){
-                            console.log('here');
-                            stripe.retrievePaymentIntent(res.clientSecret).then(({paymentIntent}) => {
-                                switch (paymentIntent.status) {
-                                    case 'succeeded':
-                                        console.log('Success! Payment received.');
-                                    break;
-
-                                    case 'processing':
-                                        console.log("Payment processing. We'll update you when payment is received.");
-                                    break;
-
-                                    case 'requires_payment_method':
-                                        console.log('Payment failed. Please try another payment method.');
-                                    break;
-
-                                    default:
-                                        console.log('Something went wrong.');
-                                    break;
-                                }
-                            });
-                        }
-                        if(res.payMethod == 'onetime')
-                        window.location.href = window.location.href;
+                        window.location.href = res.return_url;
                     }else{
                         const Toast = Swal.mixin({
                             toast: true,

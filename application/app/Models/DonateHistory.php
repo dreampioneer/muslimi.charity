@@ -17,6 +17,11 @@ class DonateHistory extends Model
         'price',
         'transaction_id',
         'dedicate_this_donation',
-        'is_zakat'
+        'is_zakat',
+        'is_monthly',
     ];
+
+    public function detail(){
+        return $this->hasMany(DonateDetail::class, 'donate_history_id', 'id');
+    }
 }

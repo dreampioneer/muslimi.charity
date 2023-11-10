@@ -24,6 +24,7 @@ Route::name('home.')
         });
         Route::get('/home', 'index')->name('index');
         Route::get('/donate', 'donate')->name('donate');
+        Route::get('/thanks/{donate_history_id}', 'thanks')->name('thanks');
     });
 
 Route::name('stripe.')

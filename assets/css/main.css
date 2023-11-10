@@ -3118,3 +3118,25 @@ input[type='checkbox']:checked, input[type='radio']:checked{
   background-color: #FFF;
   margin-bottom: 35px;
 }
+
+.thanks{
+  width: 70%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 16px 16px 16px 16px;
+}
+
+.thank-header{
+  border-radius: 16px 16px 0px 0px;
+  background-image: url(../img/thanks.jpg);
+  background-size: cover;
+  background-position: 80% 40%;
+}
+
+@font-face {
+  font-family: PlaypenSans-Medium;
+  src: url(../font/PlaypenSans-Medium.ttf);
+}
+
+.thank-header > h2{
+  font-family: PlaypenSans-Medium;
+}

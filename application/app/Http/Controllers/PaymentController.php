@@ -88,34 +88,20 @@ class PaymentController extends Controller
                     'payment_behavior' => 'default_incomplete',
                     'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
                     'expand' => ['latest_invoice.payment_intent'],
-                    "description" => $request->dedicate_this_donation ? $request->dedicate_this_donation . "(Double-Time Donate)" : "Double-Time Donate",
+                    "description" => $request->dedicate_this_donation ? "Double-Time Donate - " . $request->dedicate_this_donation : "Double-Time Donate",
                 ]);
 
                 $invoice = $stripe->invoices->pay($result->latest_invoice->id, [
                     "source" => $customer->default_source
                 ]);
-
-                // $data = [
-                //     'status' => 'success',
-                //     'payMethod' => 'subscription',
-                //     'subscriptionId' => $result->id,
-                //     'clientSecret' => $result->latest_invoice->payment_intent->client_secret,
-                //     'customerId' => $customer->id
-                // ];
             } else {
 
                 $result = $stripe->charges->create([
                     "amount" => $total * 100,
                     "currency" => "usd",
                     "customer" => $customer->id,
-                    "description" => $request->dedicate_this_donation ? $request->dedicate_this_donation . "(One-Time Donate)" : "One-Time Donate",
+                    "description" => $request->dedicate_this_donation ? "One-Time Donate - " . $request->dedicate_this_donation : "One-Time Donate",
                 ]);
-
-                // $data = [
-                //     'payMethod' => 'onetime',
-                //     'status' => 'success',
-                //     'msg' => '',
-                // ];
             }
 
             $donateHistory = DonateHistory::create([
@@ -139,8 +125,13 @@ class PaymentController extends Controller
                 ]);
             }
 
-            $request->session()->flash('success', 'You have donated successfully!');
+            $data = [
+                'status' => 'success',
+                'msg' => '',
+                'return_url' => route('home.thanks', $donateHistory->id)
+            ];
 
+            $request->session()->flash('success', 'You have donated successfully!');
             return response()->json($data);
         } catch (CardException $th) {
             return response()->json(['status' => 'error', 'msg' => $th->getMessage()]);
