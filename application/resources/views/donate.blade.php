@@ -262,6 +262,16 @@
             </div>
         </div>
         <div class="mt-5 mb-2 text-center">
+            <div class="mb-5">
+                <div class="line-div pt-5 mb-5">
+                    <h2 class="w-p100 bordered text-center fw-bold fs-2">
+                        <span>What are the Rules of War? | The Laws of War</span>
+                    </h2>
+                </div>
+                <video class="w-p90" controls poster="{{ asset('assets/video/What_are_the_Rules_of_War_thumbnail.jpg') }}">
+                    <source src="{{ asset('assets/video/What_are_the_Rules_of_War.mp4') }}" type="video/mp4">
+                </video>
+            </div>
             <a href="{{ route('home.index') }}" class="btn btn-custom btn-normal fs-3">
                 <b>Visit all of our website contents</b>
             </a>

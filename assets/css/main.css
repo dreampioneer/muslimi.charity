@@ -2663,6 +2663,10 @@ section {
     width: 35px;
 }
 
+.w-p90{
+  width: 90%;
+}
+
 .w-p100{
     width: 100%;
 }
@@ -3079,4 +3083,38 @@ input[type='checkbox']:checked, input[type='radio']:checked{
 
 .ps-36{
   padding-left: 36px !important;
+}
+
+.line-div h2 {
+  color: rgba(0,0,0,.75);
+  margin: 0 0 10px;
+  font-family: open sans,Sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.line-div .bordered::before {
+  width: 100%;
+  border-style: solid;
+  border-width: 2px 0 0;
+  border-color: #e5e5e5;
+  content: "";
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+.line-div h2.bordered {
+  position: relative;
+  z-index: 1;
+}
+
+.line-div h2.bordered span{
+  padding: 0 25px;
+  background-color: #FFF;
+  margin-bottom: 35px;
 }
