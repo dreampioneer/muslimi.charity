@@ -9,6 +9,7 @@
   <meta content="" name="description">
   <meta content="" name="keywords">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
+  {!! SEO::generate() !!}
   <!-- Favicons -->
   <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
 
