@@ -104,7 +104,7 @@
                                 </a>
                             </div>
                             <div class="col-md-6">
-                                <img src="{{ $carousel['imgUrl'] }}" class="img-fluid">
+                                <img src="{{ $carousel['imgUrl'] }}" class="img-fluid" alt="slider images">
                             </div>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
                     <div class="campaign-post">
                         @if($lastCampaign['imageUrl'])
                         <a href="{{ $lastCampaign['url'] }}">
-                            <img src="{{ $lastCampaign['imageUrl'] }}" class="img-fluid">
+                            <img src="{{ $lastCampaign['imageUrl'] }}" class="img-fluid" alt="{{ $lastCampaign['title'] }}">
                         </a>
                         @endif
                         <div class="campaign-post-content clearfix">
@@ -307,10 +307,10 @@
                 <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/brand-2.webp" alt="brand-2">
             </div>
             <div class="other-img">
-                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/brand-4.webp" alt="brand-2">
+                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/brand-4.webp" alt="brand-4">
             </div>
             <div class="other-img">
-                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/IIS_logo-2.webp" alt="brand-2">
+                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/IIS_logo-2.webp" alt="IIS_logo">
             </div>
             <div class="other-img">
                 <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/img3.webp" alt="brand-2">
@@ -322,7 +322,7 @@
                 <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/logo4.webp" alt="brand-2">
             </div>
             <div class="other-img">
-                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/logo-heart-only-v6-green-1.webp" alt="brand-2">
+                <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/logo-heart-only-v6-green-1.webp" alt="logo-heart-only-v6-green">
             </div>
             <div class="other-img">
                 <img decoding="async" class="img-fluid" src="https://madinah.com/wp-content/uploads/2022/05/brand-1.webp" alt="brand-2">
