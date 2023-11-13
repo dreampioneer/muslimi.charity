@@ -5,7 +5,7 @@
         <div class="thanks mx-auto">
             <div class="text-center thank-header py-5">
                 <div class="overlay"></div>
-                <img class="mt-5 mb-3" src="{{ asset('assets/img/donate.png') }}" style="width: 100px">
+                <img class="mt-5 mb-3" src="{{ asset('assets/img/donate.png') }}" style="width: 100px" alt="thank background">
                 <h2 class="text-center fs-1 text-light">
                     Thanks for your donation, {{ $donate->first_name }} {{ $donate->last_name }}!
                 </h2>

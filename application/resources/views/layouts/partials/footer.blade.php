@@ -4,7 +4,7 @@
       <div class="row gy-4">
         <div class="col-lg-3 col-md-12 footer-info">
             <div class="logo">
-                <img src="{{ asset('assets/img/madinah-poweredby.png') }}">
+                <img src="{{ asset('assets/img/madinah-poweredby.png') }}" alt="logo">
             </div>
         </div>
 

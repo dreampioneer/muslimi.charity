@@ -6,8 +6,6 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>MUSLIMI</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   {!! SEO::generate() !!}
   <!-- Favicons -->
@@ -26,7 +24,14 @@
   <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
   @yield('style')
 </head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6DSSENH8MD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-6DSSENH8MD');
+</script>
 <body>
     @include('layouts.partials.header')
 
