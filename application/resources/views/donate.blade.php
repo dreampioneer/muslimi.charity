@@ -241,7 +241,7 @@
     <div class="container">
         <div class="row gy-5">
             <div class="col-md-6 pe-4">
-                <img src="assets/img/home.png" class="w-p100" alt="">
+                <img src="assets/img/home.png" class="w-p100" alt="gaza article">
             </div>
             <div class="col-md-6 ps-4">
                 <p class="text-dark m-2">

@@ -4,7 +4,7 @@
     <div class="container position-relative">
         <div class="row gy-5">
             <div class="col-md-6 pe-4">
-                <img src="assets/img/home.png" class="w-p100" alt="">
+                <img src="assets/img/home.png" class="w-p100" alt="gaza article">
                 <div class="py-30 text-center">
                     <a href="{{ route('home.donate') }}" class="btn btn-custom btn-large">Donate Now</a>
                 </div>
