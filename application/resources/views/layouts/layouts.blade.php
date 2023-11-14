@@ -7,6 +7,7 @@
 
   <title>MUSLIMI</title>
   <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <meta name="google-site-verification" content="D5h-tNFgMzmEke3nU53-9kjaj-d-FtA2e89jhxfnjuk" />
   {!! SEO::generate() !!}
   <!-- Favicons -->
   <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
