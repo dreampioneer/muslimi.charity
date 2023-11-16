@@ -16,9 +16,11 @@
          <image:loc>https://muslimi.charity/assets/img/home.png</image:loc>
       </image:image>
       <video:video>
-         <video:loc>https://muslimi.charity/assets/video/What_are_the_Rules_of_War.mp4</video:loc>
          <video:thumbnail_loc>https://muslimi.charity/assets/video/What_are_the_Rules_of_War_thumbnail.jpg</video:thumbnail_loc>
-      </video:video>
+         <video:content_loc>
+            https://muslimi.charity/assets/video/What_are_the_Rules_of_War.mp4
+         </video:content_loc>
+       </video:video>
    </url>
 
    <url>
