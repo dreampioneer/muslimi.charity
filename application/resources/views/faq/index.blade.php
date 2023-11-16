@@ -15,7 +15,7 @@
                     "content" => [
                         [
                             "subtitle" => "How can I change or cancel my subscription?",
-                            "subcontent" => "Change or cancel your monthly donation at any time by clicking the link in the footer of your email receipts.",
+                            "subcontent" => "Email us at info@muslimi.charity and someone from our Customer Support team will get back to you.",
                         ],
                         [
                             "subtitle" => "How can I change my payment method?",
@@ -27,18 +27,18 @@
                     "title" => "Donations",
                     "class" => "donation",
                     "content" => [
-                        [
-                            "subtitle" => "What do children receive for $0.80?",
-                            "subcontent" => "Food assistance provided by the World Food Programme varies depending on the situation and the specific needs of the community being helped. Where there is plenty of food in the marketplace but people can't afford to buy it, cash transfers, vouchers or cash are given to families to help them purchase food. In emergencies, WFP often provides high-energy biscuits, hot meals and food packages. WFP is also the largest provider of school meals to children around the world. Visit goals in the app to see the specific type of assistance being given."
-                        ],
+                        // [
+                        //     "subtitle" => "What do children receive for $0.80?",
+                        //     "subcontent" => "Food assistance provided by the World Food Programme varies depending on the situation and the specific needs of the community being helped. Where there is plenty of food in the marketplace but people can't afford to buy it, cash transfers, vouchers or cash are given to families to help them purchase food. In emergencies, WFP often provides high-energy biscuits, hot meals and food packages. WFP is also the largest provider of school meals to children around the world. Visit goals in the app to see the specific type of assistance being given."
+                        // ],
                         [
                             "subtitle" => "Can I give monthly?",
-                            "subcontent" => "Yes, you can give monthly to help feed a child in need. Swipe to the right on the donation screen until you reach \"Give monthly\", then select how many children you want to help monthly. You will be notified via email each month when your payment is collected."
+                            "subcontent" => "Yes, you can give monthly to help people in need. Please choose your desired donation amount and, if applicable, select the checkbox labeled \"Give this amount monthly\" situated above the \"Dedicate this donation\" input field."
                         ],
-                        [
-                            "subtitle" => "Are my donations tax-deductible?",
-                            "subcontent" => "Donations are tax-deductible in several countries including the United States, Germany, Canada, the Netherlands, France and South Korea, as well as some regions of Australia. You will find more details on the respective donation receipt or yearly donation summary, e.g.: In the United States, we are working together with WFP USA, who is is a 501c (3) tax-exempt organization to ensure the tax deductability of your donations. The Federal Identification (EIN) Number is 13-3843435. In Germany, we are working together with the Maecenata Foundation (tax id 143/235/55436), who are forwarding the donations to WFP. Where tax-deductibility of donations is not currently possible, the donation is considered a personal gift."
-                        ],
+                        // [
+                        //     "subtitle" => "Are my donations tax-deductible?",
+                        //     "subcontent" => "Donations are tax-deductible in several countries including the United States, Germany, Canada, the Netherlands, France and South Korea, as well as some regions of Australia. You will find more details on the respective donation receipt or yearly donation summary, e.g.: In the United States, we are working together with WFP USA, who is is a 501c (3) tax-exempt organization to ensure the tax deductability of your donations. The Federal Identification (EIN) Number is 13-3843435. In Germany, we are working together with the Maecenata Foundation (tax id 143/235/55436), who are forwarding the donations to WFP. Where tax-deductibility of donations is not currently possible, the donation is considered a personal gift."
+                        // ],
                     ]
                 ],
                 [
