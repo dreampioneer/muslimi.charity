@@ -7,6 +7,7 @@ use Artesaos\SEOTools\Facades\SEOTools;
 class FAQController extends Controller
 {
     public function index(){
+        SEOTools::setTitle('FAQs - MUSLIMI');
         SEOTools::setDescription("Changing or Canceling Subscription:
         Visit the link in your email receipts to change or cancel your monthly donation anytime.
         Changing Payment Method:
