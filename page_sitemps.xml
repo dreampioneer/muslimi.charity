@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+
    <url>
       <loc>https://muslimi.charity/home</loc>
       <image:image>
          <image:loc>https://muslimi.charity/assets/img/home.png</image:loc>
       </image:image>
    </url>
+
    <url>
-      <loc>hhttps://muslimi.charity/donate</loc>
+      <loc>https://muslimi.charity/donate</loc>
       <image:image>
          <image:loc>https://muslimi.charity/assets/img/home.png</image:loc>
       </image:image>
@@ -15,13 +19,16 @@
          <image:loc>https://muslimi.charity/assets/video/What_are_the_Rules_of_War_thumbnail.jpg</image:loc>
       </image:image>
       <video:video>
-         <video:loc>https://muslimi.charity/assets/video/What_are_the_Rules_of_War.mp4</image:loc>
+         <video:loc>https://muslimi.charity/assets/video/What_are_the_Rules_of_War.mp4</video:loc>
       </video:video>
    </url>
+
    <url>
-      <loc>hhttps://muslimi.charity/faq</loc>
+      <loc>https://muslimi.charity/faq</loc>
    </url>
+
    <url>
-      <loc>hhttps://muslimi.charity/thanks</loc>
+      <loc>https://muslimi.charity/thanks</loc>
    </url>
+
 </urlset>
