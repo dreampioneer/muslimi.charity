@@ -13,7 +13,7 @@ return [
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
             'description'  => 'For those who helped create the Genki Dama', // set false to total remove
             'separator'    => ' - ',
-            'keywords'     => ["Gaza aid", "Humanitarian crisis", "Charity for Palestine", "Donate for Gaza", "Emergency relief", "Amana donation", "Support for Palestine", "Rafah border crossing", "Crisis response", "Unity in charity", "Urgent aid", "Gaza emergency", "Children in need", "Humanitarian support", "Ummah solidarity", "Palestine relief", "Lifeline for Gaza", "Rafah border news", "Muslimi charity", "Peace for Palestine"],
+            'keywords'     => ["muslimi", "donation", "donate", "charity", "muslimi donate", "muslimi charity","Gaza aid", "Humanitarian crisis", "Charity for Palestine", "Donate for Gaza", "Emergency relief", "Amana donation", "Support for Palestine", "Rafah border crossing", "Crisis response", "Unity in charity", "Urgent aid", "Gaza emergency", "Children in need", "Humanitarian support", "Ummah solidarity", "Palestine relief", "Lifeline for Gaza", "Rafah border news", "Muslimi charity", "Peace for Palestine"],
             'canonical'    => 'full', // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
             'robots'       => false, // Set to 'all', 'none' or any combination of index/noindex and follow/nofollow
         ],

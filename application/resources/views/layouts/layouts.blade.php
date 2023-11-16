@@ -8,8 +8,8 @@
   <title>MUSLIMI</title>
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   {{-- <meta name="google-site-verification" content="D5h-tNFgMzmEke3nU53-9kjaj-d-FtA2e89jhxfnjuk" /> --}}
-  <meta name="google-site-verification" content="VUPkv6lxN1Mo23O3l8vyUMAZ-SysfUNOAY1fFH2DaZ4" />
   {!! SEO::generate() !!}
+  <meta name="google-site-verification" content="VUPkv6lxN1Mo23O3l8vyUMAZ-SysfUNOAY1fFH2DaZ4" />
   <!-- Favicons -->
   <link href="{{ asset('assets/img/muslimi-favicon.png') }}" rel="icon">
 

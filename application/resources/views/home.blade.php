@@ -6,7 +6,7 @@
             <div class="col-md-6 pe-4">
                 <img src="assets/img/home.png" class="w-p100" alt="gaza article">
                 <div class="py-30 text-center">
-                    <a href="{{ route('home.donate') }}" class="btn btn-custom btn-large">Donate Now</a>
+                    <a href="{{ route('home.donate') }}" class="btn btn-custom btn-large" title="Donate Now">Donate Now</a>
                 </div>
             </div>
             <div class="col-md-6 ps-4">
@@ -51,7 +51,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-6 col-sm-12 align-self-center">
                                 <h2 class="slide-title">
-                                    <a class="primary" href="{{ $carousel['href'] }}">{{ $carousel['title'] }}</a>
+                                    <a class="primary" href="{{ $carousel['href'] }}" title="{{ $carousel['title'] }}">{{ $carousel['title'] }}</a>
                                 </h2>
                                 <p class="slide-intro">{{ $carousel['body'] }}</p>
                                 <div class="slide-timeline">
@@ -87,7 +87,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ $carousel['href'] }}" class="btn btn-custom btn-normal">
+                                <a href="{{ $carousel['href'] }}" class="btn btn-custom btn-normal" title="Donate Now">
                                     Donate Now
                                 </a>
                             </div>
@@ -166,17 +166,17 @@
                 <div class="col-sm-12 col-md-6 col-lg-4">
                     <div class="campaign-post">
                         @if($lastCampaign['imageUrl'])
-                        <a href="{{ $lastCampaign['url'] }}">
+                        <a href="{{ $lastCampaign['url'] }}" title="{{ $lastCampaign['title'] }}">
                             <img src="{{ $lastCampaign['imageUrl'] }}" class="img-fluid" alt="{{ $lastCampaign['title'] }}">
                         </a>
                         @endif
                         <div class="campaign-post-content clearfix">
                             <h3>
-                                <a class="primary" href="{{ $lastCampaign['url'] }}">{{ $lastCampaign['title'] }}</a>
+                                <a class="primary" href="{{ $lastCampaign['url'] }}" title="{{ $lastCampaign['title'] }}">{{ $lastCampaign['title'] }}</a>
                             </h3>
                             <span class="entry-author">by {{ $lastCampaign['auther'] }}</span>
                             <span class="entry-category">in
-                                <a href="https://madinah.com/{{ $lastCampaign['tag'] }}/" class="primary" rel="tag">
+                                <a href="https://madinah.com/{{ $lastCampaign['tag'] }}/" class="primary" rel="tag" title="{{ ucwords(str_replace('-', ' ', $lastCampaign['tag'])) }}">
                                     {{ ucwords(str_replace('-', ' ', $lastCampaign['tag'])) }}
                                 </a>
                             </span>
@@ -212,7 +212,7 @@
                             </div>
                         </div>
                         <div class="campaign-action">
-                            <a href="{{ $lastCampaign['donateUrl'] }}" class="btn btn-custom btn-normal">Donate Now</a>
+                            <a href="{{ $lastCampaign['donateUrl'] }}" class="btn btn-custom btn-normal" title="Donate Now">Donate Now</a>
                         </div>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/02/quran-majid-img.jpg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/dawah-and-education/">Dawah and Education</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/dawah-and-education/" title="Dawah and Education">Dawah and Education</a>
                         </h3>
                     </div>
                 </div>
@@ -243,7 +243,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/02/WhatsApp-Image-2023-02-06-at-11.21.36-PM.jpg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/emergency-appeal/">Emergency Appeal</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/emergency-appeal/" title="Emergency Appeal">Emergency Appeal</a>
                         </h3>
                     </div>
                 </div>
@@ -252,7 +252,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/02/fw-1-scaled.jpg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/food-and-water-relief/">Food and Water Relief</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/food-and-water-relief/" title="Food and Water Relief">Food and Water Relief</a>
                         </h3>
                     </div>
                 </div>
@@ -261,7 +261,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/02/masjid-img.jpg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/masjid-development-and-support/">Masjid Development and Support</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/masjid-development-and-support/" title="Masjid Development and Support">Masjid Development and Support</a>
                         </h3>
                     </div>
                 </div>
@@ -270,7 +270,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/01/IMG-20220515-WA0032-1.jpeg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/orphan-relief/">Orphan Relief</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/orphan-relief/" title="Orphan Relief">Orphan Relief</a>
                         </h3>
                     </div>
                 </div>
@@ -279,7 +279,7 @@
                 <div class="campaign-categories-img" style="background-image:url(https://madinah.com/wp-content/uploads/2023/02/r-scaled.jpg)">
                     <div class="title">
                         <h3>
-                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/refugee-support/">Refugee Support</a>
+                            <a class="campaign-categories-img-title text-center" href="https://madinah.com/refugee-support/" title="Refugee Support">Refugee Support</a>
                         </h3>
                     </div>
                 </div>
