@@ -39,8 +39,6 @@ class PaymentController extends Controller
 
         try {
             $email = $request->email;
-            $firstName = $request->first_name;
-            $lastName = $request->last_name;
             $stripe = new StripeClient(env('STRIPE_SECRET'));
 
             $customers = $stripe->customers->all([
@@ -49,11 +47,12 @@ class PaymentController extends Controller
             ]);
 
             foreach ($customers->autoPagingIterator() as $customer) {
-                if ($customer->metadata->first_name == $firstName && $customer->metadata->last_name == $lastName) {
+                if ($customer->name == $request->first_name . " " . $request->last_name) {
                     $customerId = $customer->id;
                     break;
                 }
             }
+
             if (isset($customerId)) {
                 $customer = $stripe->customers->retrieve($customerId);
             } else {
@@ -108,6 +107,7 @@ class PaymentController extends Controller
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
+                'customer_id' => $customer->id,
                 'phone' => $request->phone_number,
                 'dedicate_this_donation' => $request->dedicate_this_donation,
                 'is_zakat' => $request->is_zakat == 'true' ? 1 : 0,
