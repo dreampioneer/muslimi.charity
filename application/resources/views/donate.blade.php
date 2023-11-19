@@ -209,7 +209,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 pb-4">
-                                <input type="checkbox" class="form-check-input" id="is_monthly">
+                                <input type="checkbox" class="form-check-input" id="is_monthly" disabled>
                                 <label class="form-check-label" for="is_monthly">&nbsp;&nbsp;Give this amount monthly (Optional)</label>
                             </div>
                             <div class="col-md-12 pb-4">
