@@ -20,7 +20,7 @@ class HomeController extends Controller
 
     public function donate(){
         SEOTools::setTitle('Donate - MUSLIMI');
-        SEOTools::setDescription("Support Muslimi's humanitarian efforts to aid our brothers and sisters in Gaza. Your donation serves as an Amana, ensuring vital aid reaches those in need. With an alarming death toll and countless injuries, your contribution can be a lifeline for families facing shortages of food, medicine, and water. Our charity partners are actively delivering emergency aid, and your support will help supply hot meals, medical supplies, shelter, and comprehensive aid packages to those affected. Stand united with the Ummah in this critical hour and make a difference for the innocent civilians in Gaza.");
+        SEOTools::setDescription(config('constants.home_content'));
         SEOTools::opengraph()->setUrl(route("home.donate"));
         SEOTools::setCanonical(route("home.donate"));
         SEOTools::opengraph()->addProperty('type', 'donate');
