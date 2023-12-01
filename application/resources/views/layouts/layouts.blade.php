@@ -24,14 +24,17 @@
   <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
   @yield('style')
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-82GT0XVBNM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-82GT0XVBNM');
-</script>
+@production
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-82GT0XVBNM"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-82GT0XVBNM');
+    </script>
+@endproduction
+
 <body>
     @include('layouts.partials.header')
 

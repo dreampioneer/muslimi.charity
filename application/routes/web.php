@@ -35,6 +35,14 @@ Route::name('stripe.')
         Route::post('/payment', 'store')->name('store');
     });
 
+Route::name('square.')
+    ->controller(PaymentController::class)
+    ->prefix('square')
+    ->group(function () {
+        // Route::get('/payment', 'index')->name('index');
+        Route::post('/square-payment', 'squarePayment')->name('squarePayment');
+    });
+
 Route::name('faq.')
     ->controller(FAQController::class)
     ->group(function () {

@@ -158,48 +158,31 @@
                         <div class="row my-4">
                             <div class="col-md-6">
                                 <div class="">
-                                    <label for="" class="form-label">First Name&nbsp;<span class="text-danger">*</span></label>
+                                    <label class="form-label">First Name&nbsp;<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name" value="{{ old('first_name') }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="">
-                                    <label for="" class="form-label">Last Name&nbsp;<span class="text-danger">*</span></label>
+                                    <label class="form-label">Last Name&nbsp;<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name" value="{{ old('last_name') }}">
                                 </div>
                             </div>
                         </div>
                         <div class="row my-4">
                             <div class="">
-                                <label for="" class="form-label">Email Address&nbsp;<span class="text-danger">*</span></label>
+                                <label class="form-label">Email Address&nbsp;<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="email" name="email" placeholder="Email Address" value="{{ old('email') }}">
                             </div>
                         </div>
                         <div class="row my-4">
                             <div class="">
-                                <label for="" class="form-label">Phone (optional)</label>
+                                <label class="form-label">Phone (optional)</label>
                                 <input type="text" class="form-control" id="phone-number" name="phone_number" placeholder="Phone Number" value="{{ old('phone_number') }}">
                             </div>
                         </div>
                         <div class="row my-4">
-                            <div class="">
-                                <label for="" class="form-label">Card Number&nbsp;<span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="card-number" name="card_number" placeholder="Card Number"  value="{{ old('card_number') }}">
-                            </div>
-                        </div>
-                        <div class="row my-4">
-                            <div class="col-md-6">
-                                <div class="">
-                                    <label for="" class="form-label">Expirey Date&nbsp;<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="expirey-date" name="expirey_date" placeholder="Expirey Date">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="">
-                                    <label for="" class="form-label">CVV&nbsp;<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="cvc" name="cvc" placeholder="CVV">
-                                </div>
-                            </div>
+                            <div id="card-container"></div>
                         </div>
                     </div>
                     <div class="donate-detail-div">
@@ -213,7 +196,7 @@
                                 <label class="form-check-label" for="is_monthly">&nbsp;&nbsp;Give this amount monthly (Optional)</label>
                             </div>
                             <div class="col-md-12 pb-4">
-                                <label for="" class="form-label">Dedicate this donation (Optional)</label>
+                                <label class="form-label">Dedicate this donation (Optional)</label>
                                 <input type="text" class="form-control" id="dedicate-this-donation" name="dedicate_this_donation" placeholder="Name of someone special" value="">
                             </div>
                             <div class="col-md-12 pb-4">
@@ -268,23 +251,162 @@
 </section>
 @endsection
 @section('script')
-    <script src="{{ asset('assets/vendor/jquery.mask.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/jquery.inputmask.min.js') }}"></script>
-    <script src="https://js.stripe.com/v2/"></script>
-    <script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript" src="{{ asset('assets/vendor/jquery.mask.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/vendor/jquery.inputmask.min.js') }}"></script>
+    <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
     <script type="text/javascript">
-    Stripe.setPublishableKey('{{ env("STRIPE_KEY") }}');
-    const stripe = Stripe('pk_test_VOOyyYjgzqdm8I3SrBqmh9qY');
-    var flag = true;
-    $(document).ready(function(){
-        $(".donate-detail-div").hide();
-        $(".bill-detial").hide();
-        $(".btn-cancel").hide();
-        $('#card-number').mask('0000 0000 0000 0000');
-        $('#expirey-date').mask('00/00');
-        $('#cvc').mask('0000');
-        $('#phone-number').mask('(999)-999-9999');
-    })
+        var flag = true;
+        $(document).ready(function () {
+            const appId = "{{ env('SQUARE_APPLICATION_ID') }}";
+            const locationId = "{{ env('SQUARE_LOCATION_ID') }}";
+            const idempotencyKey = "{{ $idempotencyKey }}";
+            let card;
+
+            async function initializeCard(payments) {
+                card = await payments.card();
+                await card.attach('#card-container');
+                return card;
+            }
+
+            if (!window.Square) {
+                throw new Error('Square.js failed to load properly');
+            }
+
+            const payments = window.Square.payments(appId, locationId);
+
+            try {
+                initializeCard(payments);
+            } catch (e) {
+                console.error('Initializing Card failed', e);
+                return;
+            }
+
+            $('.btn-donate').on('click', async function (event) {
+                if(!donates.length){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'error',
+                        title: "Please select donation amount!",
+                    });
+                    return;
+                }
+                if(flag){
+                    $(".donate-item-div").hide();
+                    $(".bill-detial").show();
+                    $(".btn-cancel").show();
+                    flag = !flag;
+                    $("html, body").animate({ scrollTop: 0 }, "fast");
+                }else{
+                    $('#first-name').trigger('change');
+                    $('#last-name').trigger('change');
+                    $('#email').trigger('change');
+                    let invalidCount = $('.bill-detial').find('.is-invalid').length;
+                    if(!invalidCount){
+                        try {
+                            $(".btn-donate").attr('disabled', true);
+                            html = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>' + "&nbsp;&nbsp;Donate Now";
+                            $(".btn-donate").html(html);
+                            const token = await tokenize(card);
+                            const paymentResults = await createPayment(token);
+                            console.debug('Payment Success', paymentResults);
+                        } catch (e) {
+                            $(".btn-donate").attr('disabled', false);
+                            $(".btn-donate").html('Donate Now');
+                            return;
+                        }
+                    }
+                }
+
+            });
+
+            async function createPayment(token) {
+                let first_name = $('#first-name').val();
+                let last_name = $('#last-name').val();
+                let email = $('#email').val();
+                let phone_number = $('#phone-number').val();
+                let dedicate_this_donation = $('#dedicate-this-donation').val();
+                let is_zakat = $('#is_zakat').prop('checked');
+                let is_monthly = $('#is_monthly').prop('checked');
+                $.ajax({
+                    url: "{{ route('square.squarePayment') }}",
+                    method: 'POST',
+                    data: {
+                        first_name,
+                        last_name,
+                        email,
+                        phone_number,
+                        dedicate_this_donation,
+                        is_zakat,
+                        donates,
+                        is_monthly,
+                        locationId,
+                        sourceId: token,
+                        idempotencyKey
+                    },
+                    success: function(res){
+                        if(res.status == 'success'){
+                            window.location.href = res.return_url;
+                        }else{
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: "top-end",
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.onmouseenter = Swal.stopTimer;
+                                    toast.onmouseleave = Swal.resumeTimer;
+                                }
+                            });
+                            Toast.fire({
+                                icon: res.status,
+                                title: res.msg,
+                            });
+                        }
+                        $(".btn-donate").attr('disabled', false);
+                        $(".btn-donate").html('Donate Now');
+                    },
+                    error: function(){
+                        alert("Something went wrong. Please try again!");
+                        $(".btn-donate").attr('disabled', false);
+                        $(".btn-donate").html('Donate Now');
+                    }
+                })
+            }
+
+            async function tokenize(paymentMethod) {
+                const tokenResult = await paymentMethod.tokenize();
+
+                if (tokenResult.status === 'OK') {
+                    return tokenResult.token;
+                } else {
+                    let errorMessage = `Tokenization failed-status: ${tokenResult.status}`;
+                    if (tokenResult.errors) {
+                        errorMessage += ` and errors: ${JSON.stringify(tokenResult.errors)}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+            }
+
+            $(".donate-detail-div").hide();
+            $(".bill-detial").hide();
+            $(".btn-cancel").hide();
+            $('#card-number').mask('0000 0000 0000 0000');
+            $('#expirey-date').mask('00/00');
+            $('#cvc').mask('0000');
+            $('#phone-number').mask('(999)-999-9999');
+        });
+
     // Donate
     var donates = [];
     $('.donate-item-div input[type=checkbox]').change(function(){
@@ -471,63 +593,63 @@
         }
     })
 
-    $(".btn-donate").click(function(){
-        if(!donates.length){
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: 'error',
-                title: "Please select donation amount!",
-            });
-            return;
-        }
-        if(flag){
-            $(".donate-item-div").hide();
-            $(".bill-detial").show();
-            $(".btn-cancel").show();
-        }else{
-            $(".btn-donate").attr('disabled', 'disabled');
-            html = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>' + "&nbsp;&nbsp;Donate Now";
-            $(".btn-donate").html(html);
-            $('#first-name').trigger('change');
-            $('#last-name').trigger('change');
-            $('#email').trigger('change');
-            $('#card-number').trigger('change');
-            $('#expirey-date').trigger('change');
-            $('#cvc').trigger('change');
-            let invalidCount = $('.bill-detial').find('.is-invalid').length;
-            if(!invalidCount){
-                let ccNum = $('#card-number').val();
-                let cvcNum = $('#cvc').val();
-                let expDate = $('#expirey-date').val();
-                expDate = expDate.split('/');
-                let expMonth = expDate[0];
-                let expYear = expDate[1];
-                Stripe.card.createToken({
-                    number: ccNum,
-                    cvc: cvcNum,
-                    exp_month: expMonth,
-                    exp_year: expYear
-                }, stripeResponseHandler);
-                return;
-            }else{
-                $(".btn-donate").attr('disabled', false);
-                $(".btn-donate").html('Donate Now');
-                return;
-            }
-        }
-        $("html, body").animate({ scrollTop: 0 }, "fast");
-        flag = !flag;
-    })
+    // $(".btn-donate").click(function(){
+    //     if(!donates.length){
+    //         const Toast = Swal.mixin({
+    //             toast: true,
+    //             position: "top-end",
+    //             showConfirmButton: false,
+    //             timer: 3000,
+    //             timerProgressBar: true,
+    //             didOpen: (toast) => {
+    //                 toast.onmouseenter = Swal.stopTimer;
+    //                 toast.onmouseleave = Swal.resumeTimer;
+    //             }
+    //         });
+    //         Toast.fire({
+    //             icon: 'error',
+    //             title: "Please select donation amount!",
+    //         });
+    //         return;
+    //     }
+    //     if(flag){
+    //         $(".donate-item-div").hide();
+    //         $(".bill-detial").show();
+    //         $(".btn-cancel").show();
+    //     }else{
+    //         $(".btn-donate").attr('disabled', 'disabled');
+    //         html = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>' + "&nbsp;&nbsp;Donate Now";
+    //         $(".btn-donate").html(html);
+    //         $('#first-name').trigger('change');
+    //         $('#last-name').trigger('change');
+    //         $('#email').trigger('change');
+    //         $('#card-number').trigger('change');
+    //         $('#expirey-date').trigger('change');
+    //         $('#cvc').trigger('change');
+    //         let invalidCount = $('.bill-detial').find('.is-invalid').length;
+    //         if(!invalidCount){
+    //             let ccNum = $('#card-number').val();
+    //             let cvcNum = $('#cvc').val();
+    //             let expDate = $('#expirey-date').val();
+    //             expDate = expDate.split('/');
+    //             let expMonth = expDate[0];
+    //             let expYear = expDate[1];
+    //             Stripe.card.createToken({
+    //                 number: ccNum,
+    //                 cvc: cvcNum,
+    //                 exp_month: expMonth,
+    //                 exp_year: expYear
+    //             }, stripeResponseHandler);
+    //             return;
+    //         }else{
+    //             $(".btn-donate").attr('disabled', false);
+    //             $(".btn-donate").html('Donate Now');
+    //             return;
+    //         }
+    //     }
+    //     $("html, body").animate({ scrollTop: 0 }, "fast");
+    //     flag = !flag;
+    // })
 
     $('.btn-cancel').click(function(){
         if(flag){
@@ -559,21 +681,21 @@
         validateEmail(email);
     });
 
-    $('#card-number').change(function(){
-        let ccNum = $(this).val();
-        validateCardNumber(ccNum);
-    });
+    // $('#card-number').change(function(){
+    //     let ccNum = $(this).val();
+    //     validateCardNumber(ccNum);
+    // });
 
-    $('#expirey-date').change(function(){
-        let expDate = $(this).val();
-        validateExpiredDate(expDate)
-    });
+    // $('#expirey-date').change(function(){
+    //     let expDate = $(this).val();
+    //     validateExpiredDate(expDate)
+    // });
 
-    $('#cvc').change(function(){
-        let cvcNum = $(this).val();
-        let flag = validateCVC(cvcNum);
-        return true;
-    });
+    // $('#cvc').change(function(){
+    //     let cvcNum = $(this).val();
+    //     let flag = validateCVC(cvcNum);
+    //     return true;
+    // });
 
     function validateRequired(selector, value){
         if (!value.length) {
@@ -592,32 +714,32 @@
         }
     }
 
-    function validateCardNumber(ccNum){
-        if (!Stripe.card.validateCardNumber(ccNum)) {
-            reportError('card-number', 'The credit card number appears to be invalid.');
-        }else{
-            reportSuccess('card-number');
-        }
-    }
+    // function validateCardNumber(ccNum){
+    //     if (!Stripe.card.validateCardNumber(ccNum)) {
+    //         reportError('card-number', 'The credit card number appears to be invalid.');
+    //     }else{
+    //         reportSuccess('card-number');
+    //     }
+    // }
 
-    function validateExpiredDate(expDate){
-        let expData = expDate.split('/');
-        let expMonth = expData[0];
-        let expYear = expData[1];
-        if (!Stripe.card.validateExpiry(expMonth, expYear)) {
-            reportError('expirey-date', 'The expiration date appears to be invalid.');
-        }else{
-            reportSuccess('expirey-date');
-        }
-    }
+    // function validateExpiredDate(expDate){
+    //     let expData = expDate.split('/');
+    //     let expMonth = expData[0];
+    //     let expYear = expData[1];
+    //     if (!Stripe.card.validateExpiry(expMonth, expYear)) {
+    //         reportError('expirey-date', 'The expiration date appears to be invalid.');
+    //     }else{
+    //         reportSuccess('expirey-date');
+    //     }
+    // }
 
-    function validateCVC(cvcNum){
-        if (!Stripe.card.validateCVC(cvcNum)) {
-            reportError('cvc', 'The CVV number appears to be invalid.');
-        }else{
-            reportSuccess('cvc');
-        }
-    }
+    // function validateCVC(cvcNum){
+    //     if (!Stripe.card.validateCVC(cvcNum)) {
+    //         reportError('cvc', 'The CVV number appears to be invalid.');
+    //     }else{
+    //         reportSuccess('cvc');
+    //     }
+    // }
 
     function reportError(selector, msg){
         if (!$('#' + selector).hasClass('is-invalid')) {
@@ -632,69 +754,69 @@
         $('#' + selector).parent().find('.invalid-feedback').remove();
     }
 
-    function stripeResponseHandler(status, response) {
-        if (response.error) {
-            $(".btn-donate").attr('disabled', false);
-            $(".btn-donate").html('Donate Now');
-        } else {
-            var stripeToken = response['id'];
-            let card_number = $('#card-number').val();
-            let cvc = $('#cvc').val();
-            let expirey_date = $('#expirey-date').val();
-            let first_name = $('#first-name').val();
-            let last_name = $('#last-name').val();
-            let email = $('#email').val();
-            let phone_number = $('#phone-number').val();
-            let dedicate_this_donation = $('#dedicate-this-donation').val();
-            let is_zakat = $('#is_zakat').prop('checked');
-            let is_monthly = $('#is_monthly').prop('checked');
-            $.ajax({
-                url: "{{ route('stripe.store') }}",
-                method: 'POST',
-                data: {
-                    stripeToken,
-                    card_number,
-                    cvc,
-                    expirey_date,
-                    first_name,
-                    last_name,
-                    email,
-                    phone_number,
-                    dedicate_this_donation,
-                    is_zakat,
-                    donates,
-                    is_monthly
-                },
-                success: function(res){
-                    if(res.status == 'success'){
-                        window.location.href = res.return_url;
-                    }else{
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top-end",
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: res.status,
-                            title: res.msg,
-                        });
-                    }
-                    $(".btn-donate").attr('disabled', false);
-                    $(".btn-donate").html('Donate Now');
-                },
-                error: function(){
-                    alert("Something went wrong. Please try again!");
-                    $(".btn-donate").attr('disabled', false);
-                    $(".btn-donate").html('Donate Now');
-                }
-            })
-        }
-    }
+    // function stripeResponseHandler(status, response) {
+    //     if (response.error) {
+    //         $(".btn-donate").attr('disabled', false);
+    //         $(".btn-donate").html('Donate Now');
+    //     } else {
+    //         var stripeToken = response['id'];
+    //         let card_number = $('#card-number').val();
+    //         let cvc = $('#cvc').val();
+    //         let expirey_date = $('#expirey-date').val();
+    //         let first_name = $('#first-name').val();
+    //         let last_name = $('#last-name').val();
+    //         let email = $('#email').val();
+    //         let phone_number = $('#phone-number').val();
+    //         let dedicate_this_donation = $('#dedicate-this-donation').val();
+    //         let is_zakat = $('#is_zakat').prop('checked');
+    //         let is_monthly = $('#is_monthly').prop('checked');
+    //         $.ajax({
+    //             url: "{{ route('stripe.store') }}",
+    //             method: 'POST',
+    //             data: {
+    //                 stripeToken,
+    //                 card_number,
+    //                 cvc,
+    //                 expirey_date,
+    //                 first_name,
+    //                 last_name,
+    //                 email,
+    //                 phone_number,
+    //                 dedicate_this_donation,
+    //                 is_zakat,
+    //                 donates,
+    //                 is_monthly
+    //             },
+    //             success: function(res){
+    //                 if(res.status == 'success'){
+    //                     window.location.href = res.return_url;
+    //                 }else{
+    //                     const Toast = Swal.mixin({
+    //                         toast: true,
+    //                         position: "top-end",
+    //                         showConfirmButton: false,
+    //                         timer: 3000,
+    //                         timerProgressBar: true,
+    //                         didOpen: (toast) => {
+    //                             toast.onmouseenter = Swal.stopTimer;
+    //                             toast.onmouseleave = Swal.resumeTimer;
+    //                         }
+    //                     });
+    //                     Toast.fire({
+    //                         icon: res.status,
+    //                         title: res.msg,
+    //                     });
+    //                 }
+    //                 $(".btn-donate").attr('disabled', false);
+    //                 $(".btn-donate").html('Donate Now');
+    //             },
+    //             error: function(){
+    //                 alert("Something went wrong. Please try again!");
+    //                 $(".btn-donate").attr('disabled', false);
+    //                 $(".btn-donate").html('Donate Now');
+    //             }
+    //         })
+    //     }
+    // }
 </script>
 @endsection

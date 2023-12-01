@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DonateHistory;
 use Illuminate\Http\Request;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Ramsey\Uuid\Uuid;
 
 class HomeController extends Controller
 {
@@ -26,7 +27,8 @@ class HomeController extends Controller
         SEOTools::opengraph()->addProperty('type', 'donate');
         SEOTools::jsonLd()->addImage(asset('assets/img/home.png'));
         $donates = DonateHistory::orderBy('created_at', 'desc')->limit(5)->get();
-        return view('donate', ['donates' => $donates]);
+        $idempotencyKey = Uuid::uuid4();
+        return view('donate', ['donates' => $donates, 'idempotencyKey' => $idempotencyKey]);
     }
 
     public function thanks($donate_history_id){
