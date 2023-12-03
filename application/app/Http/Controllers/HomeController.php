@@ -55,7 +55,7 @@ class HomeController extends Controller
             if($item->getType() === CatalogObjectType::ITEM){
                 $jsonItem = $item->jsonSerialize();
                 $data = [
-                    'donate_id' => $jsonItem['id'],
+                    'donate_id' => $jsonItem['item_data']->getVariations()[0]->getId(),
                     'donate_name' => $jsonItem['item_data']->getName(),
                     'amount' => $jsonItem['item_data']->getVariations()[0]->getItemVariationData()->getPriceMoney()->getAmount() / 100
                 ];

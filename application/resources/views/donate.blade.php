@@ -394,6 +394,7 @@
         }
         donates.push(
             {
+                'donate_id': $(this).attr('data-id'),
                 'donate_name': $(this).attr('data-name'),
                 'donate_amount': parseFloat($(this).attr('data-amount')),
                 'donate_count': 1

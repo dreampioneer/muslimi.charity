@@ -26,7 +26,11 @@ use Square\Models\Builders\CatalogSubscriptionPlanBuilder;
 use Square\Models\Builders\SubscriptionPhaseBuilder;
 use Square\Models\Builders\CreateSubscriptionRequestBuilder;
 use Square\Models\Builders\SubscriptionPricingBuilder;
+use Square\Models\Builders\CreateOrderRequestBuilder;
+use Square\Models\Builders\OrderBuilder;
+use Square\Models\Builders\OrderLineItemBuilder;
 use Square\Models\Currency;
+use Square\Models\OrderLineItemItemType;
 use Square\SquareClient;
 use Ramsey\Uuid\Uuid;
 use Square\Models\CatalogObject;
@@ -238,15 +242,45 @@ class PaymentController extends Controller
         }
 
         $total = 0;
-
+        $lineItems = [];
         foreach ($request->donates as $donate) {
             $subtotal = intval($donate['donate_count']) * floatval($donate['donate_amount']);
             $total += $subtotal;
+            array_push($lineItems,
+                OrderLineItemBuilder::init($donate['donate_count'])
+                ->catalogObjectId($donate['donate_id'])
+                ->itemType(OrderLineItemItemType::ITEM)
+                ->build()
+            );
+        }
+
+        $ordersApi = $squareClient->getOrdersApi();
+        $body = CreateOrderRequestBuilder::init()
+            ->order(
+                OrderBuilder::init(
+                    env('SQUARE_LOCATION_ID')
+                )
+                ->lineItems($lineItems)
+                ->build()
+            )
+            ->idempotencyKey($idempotencyKey)
+            ->build();
+
+        $apiResponse = $ordersApi->createOrder($body);
+
+        if ($apiResponse->isSuccess()) {
+            $createOrderResponse = $apiResponse->getResult();
+            $orderId = $createOrderResponse->getOrder()->getId();
+        } else {
+            $errors = $apiResponse->getErrors();
+            return response()->json(['status' => 'error', 'msg' => 'Something went wrong!!']);
         }
 
         if ($request->is_monthly == 'true') {
 
         }else{
+
+
             $paymentsApi = $squareClient->getPaymentsApi();
 
             $body = CreatePaymentRequestBuilder::init(
@@ -259,6 +293,7 @@ class PaymentController extends Controller
                         ->currency(Currency::USD)
                         ->build()
                 )
+                ->orderId($orderId)
                 ->autocomplete(true)
                 ->customerId($customerId)
                 ->locationId(env('SQUARE_LOCATION_ID'))
