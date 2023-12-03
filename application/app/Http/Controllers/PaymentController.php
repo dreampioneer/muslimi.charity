@@ -31,6 +31,7 @@ use Square\Models\Builders\OrderBuilder;
 use Square\Models\Builders\OrderLineItemBuilder;
 use Square\Models\Currency;
 use Square\Models\OrderLineItemItemType;
+use Square\Models\OrderState;
 use Square\SquareClient;
 use Ramsey\Uuid\Uuid;
 use Square\Models\CatalogObject;
@@ -255,22 +256,28 @@ class PaymentController extends Controller
         }
 
         $ordersApi = $squareClient->getOrdersApi();
+        if ($request->is_monthly == 'true') {
+            $orderState = OrderState::DRAFT;
+        }else{
+            $orderState = OrderState::OPEN;
+        }
         $body = CreateOrderRequestBuilder::init()
             ->order(
                 OrderBuilder::init(
                     env('SQUARE_LOCATION_ID')
                 )
                 ->lineItems($lineItems)
+                ->state($orderState)
                 ->build()
             )
             ->idempotencyKey($idempotencyKey)
             ->build();
-
         $apiResponse = $ordersApi->createOrder($body);
 
         if ($apiResponse->isSuccess()) {
             $createOrderResponse = $apiResponse->getResult();
             $orderId = $createOrderResponse->getOrder()->getId();
+            $totalAmount = $createOrderResponse->getOrder()->getTotalMoney();
         } else {
             $errors = $apiResponse->getErrors();
             return response()->json(['status' => 'error', 'msg' => 'Something went wrong!!']);
@@ -279,8 +286,6 @@ class PaymentController extends Controller
         if ($request->is_monthly == 'true') {
 
         }else{
-
-
             $paymentsApi = $squareClient->getPaymentsApi();
 
             $body = CreatePaymentRequestBuilder::init(
@@ -289,7 +294,7 @@ class PaymentController extends Controller
                 )
                 ->amountMoney(
                     MoneyBuilder::init()
-                        ->amount($total * 100)
+                        ->amount($totalAmount->getAmount())
                         ->currency(Currency::USD)
                         ->build()
                 )
