@@ -202,7 +202,7 @@ class PaymentController extends Controller
         if ($apiResponse->isSuccess()) {
             $searchCustomersResponse = $apiResponse->getResult();
             $customers = $searchCustomersResponse->getCustomers();
-            if(count($customers)){
+            if(!is_null($customers) && count($customers)){
                 $customerId = $customers[0]->getId();
             }else{
                 $createCustomerBody = CreateCustomerRequestBuilder::init()
