@@ -17,9 +17,20 @@ use Square\Models\Builders\CustomerQueryBuilder;
 use Square\Models\Builders\CustomerFilterBuilder;
 use Square\Models\Builders\CustomerTextFilterBuilder;
 use Square\Models\Builders\CreateCustomerRequestBuilder;
+use Square\Models\Builders\UpsertCatalogObjectRequestBuilder;
+use Square\Models\Builders\CatalogObjectBuilder;
+use Square\Models\CatalogObjectType;
+use Square\Models\SubscriptionCadence;
+use Square\Models\SubscriptionPricingType;
+use Square\Models\Builders\CatalogSubscriptionPlanBuilder;
+use Square\Models\Builders\SubscriptionPhaseBuilder;
+use Square\Models\Builders\CreateSubscriptionRequestBuilder;
+use Square\Models\Builders\SubscriptionPricingBuilder;
 use Square\Models\Currency;
 use Square\SquareClient;
 use Ramsey\Uuid\Uuid;
+use Square\Models\CatalogObject;
+use Square\Models\UpsertCatalogObjectRequest;
 
 class PaymentController extends Controller
 {
@@ -303,5 +314,69 @@ class PaymentController extends Controller
 
         $request->session()->flash('success', 'You have donated successfully!');
         return response()->json($data);
+    }
+
+    public function squareTest(){
+        $idempotencyKey = Uuid::uuid4();
+
+        $squareClient = new SquareClient([
+            'accessToken' => env('SQUARE_ACCESS_TOKEN'),
+            'environment' => env('SQUARE_ENVIRONMENT'),
+        ]);
+
+        $catalogApi = $squareClient->getCatalogApi();
+        $time = time();
+        $body = UpsertCatalogObjectRequestBuilder::init(
+                    $idempotencyKey,
+                    CatalogObjectBuilder::init(
+                        CatalogObjectType::SUBSCRIPTION_PLAN,
+                        "#" . $time
+                    )
+                        ->subscriptionPlanData(
+                            CatalogSubscriptionPlanBuilder::init('Plan' . $time)
+                                ->phases([
+                                    SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
+                                        ->pricing(
+                                            SubscriptionPricingBuilder::init()
+                                            ->type(SubscriptionPricingType::STATIC_)
+                                            ->build()
+                                        )->build()
+                            ])->build()
+                    )->build()
+                )->build();
+
+        $apiResponse = $catalogApi->upsertCatalogObject($body);
+
+        if ($apiResponse->isSuccess()) {
+            $upsertCatalogObjectResponse = $apiResponse->getResult();
+        } else {
+            $errors = $apiResponse->getErrors();
+        }
+
+        // echo json_encode();
+
+        // $planVariationId = $upsertCatalogObjectResponse->getId();
+
+        // $body = CreateSubscriptionRequestBuilder::init(
+        //     env('SQUARE_LOCATION_ID'),
+        //     'KPNX3NEX3BS18JF52VK7HX4T8R'
+        // )
+        //     ->idempotencyKey($idempotencyKey)
+        //     ->planVariationId($planVariationId)
+        //     ->cardId('ccof:qy5x8hHGYsgLrp4Q4GB')
+        //     ->timezone('America/Los_Angeles')
+        //     ->build();
+
+        // $apiResponse = $subscriptionsApi->createSubscription($body);
+
+        // if ($apiResponse->isSuccess()) {
+        //     $createSubscriptionResponse = $apiResponse->getResult();
+        // } else {
+        //     $errors = $apiResponse->getErrors();
+        // }
+
+        // // Getting more response information
+        // var_dump($apiResponse->getStatusCode());
+        // var_dump($apiResponse->getHeaders());
     }
 }

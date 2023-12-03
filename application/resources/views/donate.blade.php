@@ -43,54 +43,6 @@
                 @endforeach
             </div>
             @php
-                $donateFoods = [
-                    [
-                        'priceId' => 'price_1OAvfgCJAyesaXH9OhRu0Dej',
-                        'donate_name' => "Supply a family with a month's supply of Hot Meal",
-                        'amount' => 56,
-                    ],
-                    [
-                        'priceId' => 'price_1OAvfwCJAyesaXH9eytfjz4b',
-                        'donate_name' => "Supply 2 families with a month's supply of Hot Meals",
-                        'amount' => 112,
-                    ],
-                    [
-                        'priceId' => 'price_1OAvgDCJAyesaXH92YF54Gi2',
-                        'donate_name' => "Supply 5 families with a month's supply of Hot Meals",
-                        'amount' => 280,
-                    ],
-                    [
-                        'priceId' => 'price_1OAoEWCJAyesaXH9JerRyR1b',
-                        'donate_name' => "Supply 10 families with a month's supply of Hot Meals",
-                        'amount' => 560,
-                    ],
-                    [
-                        'priceId' => 'price_1OAvgoCJAyesaXH91fXJGDYz',
-                        'donate_name' => "Supply 20 families with a month's supply of Hot Meals",
-                        'amount' => 1120,
-                    ],
-                ];
-                $donateMedicalSupplies = [
-                    [
-                        'priceId' => 'price_1OAvh3CJAyesaXH9ZFnDI3J1',
-                        'donate_name' => "Emergency Medical Supplies to Hospitals",
-                        'amount' => 200,
-                    ]
-                ];
-                $donateShelter = [
-                    [
-                        'priceId' => 'price_1OAvhgCJAyesaXH9OO9kkC8a',
-                        'donate_name' => "Emergency Shelter",
-                        'amount' => 500,
-                    ]
-                ];
-                $donateAidCombo = [
-                    [
-                        'priceId' => 'price_1OAvhuCJAyesaXH93yooc4hs',
-                        'donate_name' => "Emergency Aid Combo (Meals, Water, Aid, Shelter)",
-                        'amount' => 1000,
-                    ]
-                ];
                 $donates = [
                     [
                         'title' => 'Donate for Food',
@@ -139,7 +91,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <p class="fs-6 mb-0">
-                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-price-id="{{ $donateItem["priceId"] }}" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;${{  number_format($donateItem["amount"], 2, '.', ',')}}
+                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-id="{{ $donateItem["donate_id"] }}" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;${{  number_format($donateItem["amount"], 2, '.', ',')}}
                                                 </p>
                                             </div>
                                             <div class="col-md-8">
@@ -417,7 +369,7 @@
             $('input[name=' + radioName + ']').eq(0).prop('checked', true);
             donates.push(
                 {
-                    'donate_price_id': $('input[name=' + radioName + ']').eq(0).attr('data-price-id'),
+                    'donate_id': $('input[name=' + radioName + ']').eq(0).attr('data-id'),
                     'donate_name': $('input[name=' + radioName + ']').eq(0).attr('data-name'),
                     'donate_amount': parseFloat($('input[name=' + radioName + ']').eq(0).attr('data-amount')),
                     'donate_count': 1

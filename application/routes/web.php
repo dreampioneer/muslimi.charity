@@ -41,6 +41,7 @@ Route::name('square.')
     ->group(function () {
         // Route::get('/payment', 'index')->name('index');
         Route::post('/square-payment', 'squarePayment')->name('squarePayment');
+        Route::get('/square-test', 'squareTest')->name('squareTest');
     });
 
 Route::name('faq.')
