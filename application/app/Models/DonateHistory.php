@@ -14,7 +14,6 @@ class DonateHistory extends Model
         'last_name',
         'email',
         'customer_id',
-        'phone',
         'price',
         'transaction_id',
         'dedicate_this_donation',

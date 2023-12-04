@@ -108,7 +108,6 @@ class PaymentController extends Controller
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'customer_id' => $customer->id,
-                'phone' => $request->phone_number,
                 'dedicate_this_donation' => $request->dedicate_this_donation,
                 'is_zakat' => $request->is_zakat == 'true' ? 1 : 0,
                 'is_monthly' => $request->is_monthly == 'true' ? 1 : 0,

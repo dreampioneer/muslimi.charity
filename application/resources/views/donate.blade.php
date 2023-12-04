@@ -177,12 +177,6 @@
                         </div>
                         <div class="row my-4">
                             <div class="">
-                                <label for="" class="form-label">Phone (optional)</label>
-                                <input type="text" class="form-control" id="phone-number" name="phone_number" placeholder="Phone Number" value="{{ old('phone_number') }}">
-                            </div>
-                        </div>
-                        <div class="row my-4">
-                            <div class="">
                                 <label for="" class="form-label">Card Number&nbsp;<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="card-number" name="card_number" placeholder="Card Number"  value="{{ old('card_number') }}">
                             </div>
@@ -283,7 +277,6 @@
         $('#card-number').mask('0000 0000 0000 0000');
         $('#expirey-date').mask('00/00');
         $('#cvc').mask('0000');
-        $('#phone-number').mask('(999)-999-9999');
     })
     // Donate
     var donates = [];
@@ -644,7 +637,6 @@
             let first_name = $('#first-name').val();
             let last_name = $('#last-name').val();
             let email = $('#email').val();
-            let phone_number = $('#phone-number').val();
             let dedicate_this_donation = $('#dedicate-this-donation').val();
             let is_zakat = $('#is_zakat').prop('checked');
             let is_monthly = $('#is_monthly').prop('checked');
@@ -659,7 +651,6 @@
                     first_name,
                     last_name,
                     email,
-                    phone_number,
                     dedicate_this_donation,
                     is_zakat,
                     donates,
