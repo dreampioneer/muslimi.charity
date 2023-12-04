@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                             <div class="donation-amount">
-                                <p class="fs-4 m-0 text-primary"><b>$ {{ number_format($donate->price, 2, '.', ',') }}</b></p>
+                                <p class="fs-4 m-0 text-primary"><b>{{ number_format($donate->price, 2, '.', ',') }} € (Euro)</b></p>
                             </div>
                         </div>
                     </div>
@@ -139,7 +139,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <p class="fs-6 mb-0">
-                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-price-id="{{ $donateItem["priceId"] }}" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;${{  number_format($donateItem["amount"], 2, '.', ',')}}
+                                                    <input class="form-check-input" type="radio" name="{{ $donate['class'] }}_radio" data-price-id="{{ $donateItem["priceId"] }}" data-name="{{ $donateItem["donate_name"] }}" data-amount="{{ $donateItem["amount"] }}">&nbsp;&nbsp;{{  number_format($donateItem["amount"], 2, '.', ',')}} € (Euro)
                                                 </p>
                                             </div>
                                             <div class="col-md-8">
@@ -307,17 +307,27 @@
     $('.donate-item-div input[type=radio]').change(function(){
         let checked = $(this).prop('checked');
         let name = $(this).attr('name');
+        let donateName = $(this).attr('data-name');
         checkboxName = name.replace('radio', 'checkbox');
         if(checked){
             $('input[name=' + checkboxName + ']').prop('checked', true);
         }
         donates.push(
             {
-                'donate_name': $(this).attr('data-name'),
+                'donate_name': donateName,
                 'donate_amount': parseFloat($(this).attr('data-amount')),
                 'donate_count': 1
             }
         );
+        let radioBoxes = $('input[name=' + name + ']');
+        let filters = [];
+        for(i = 0; i < radioBoxes.length; i++){
+            console.log(radioBoxes.eq(i).attr('data-name'));
+            if(radioBoxes.eq(i).attr('data-name') !== donateName){
+                filters.push(radioBoxes.eq(i).attr('data-name'))
+            }
+        }
+        donates = donates.filter(item => !filters.includes(item.donate_name));
         calculateTotal();
     })
 
@@ -336,10 +346,10 @@
                                     '<p class="my-auto">' + donates[i]['donate_name'] + '</p>' +
                                 '</div>' +
                                 '<div class="col-md-1 d-flex p-0">' +
-                                    '<p class="my-auto">$' + parseFloat(donates[i]['donate_amount']).toLocaleString('en-US', {
+                                    '<p class="my-auto">' + parseFloat(donates[i]['donate_amount']).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
-                                    }) + '</p>' +
+                                    }) + ' € (Euro)</p>' +
                                 '</div>' +
                                 '<div class="col-md-3 d-flex ps-36">' +
                                     '<div class="input-group my-auto">' +
@@ -349,10 +359,10 @@
                                     '</div>' +
                                 '</div>' +
                                 '<div class="col-md-2 d-flex">' +
-                                    '<p class="my-auto w-p100 fw-semibold text-right total-' + i + '">$ ' + (parseFloat(donates[i]['donate_amount']) * parseInt(donates[i]['donate_count'])).toLocaleString('en-US', {
+                                    '<p class="my-auto w-p100 fw-semibold text-right total-' + i + '">' + (parseFloat(donates[i]['donate_amount']) * parseInt(donates[i]['donate_count'])).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
-                                    })  + '</p>' +
+                                    })  + ' € (Euro)</p>' +
                                 '</div>' +
                             '</div>';
         }
@@ -361,10 +371,10 @@
                             '<h5 class="fw-semibold">Total</h5>' +
                         '</div>' +
                         '<div class="col-md-4">' +
-                            '<h5 class="total text-right fw-semibold">$ ' + totalAmount.toLocaleString('en-US', {
+                            '<h5 class="total text-right fw-semibold">' + totalAmount.toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
-                            }) + '</h5>' +
+                            }) + ' € (Euro)</h5>' +
                         '</div>' +
                     '</div>';
         $(".donate-detail").html(html);
@@ -406,14 +416,14 @@
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     });
-        $('.total-' + index).text("$ " + subTotal);
+        $('.total-' + index).text(subTotal + " € (Euro)");
         donates[index]['donate_count'] = value;
         let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(item['donate_amount']), 0);
         totalAmount = totalAmount.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     });
-        $('.total').text('$ ' + totalAmount);
+        $('.total').text(totalAmount + " € (Euro)");
     });
 
     $(".donate-div").on('click', '.btn-add', function(){
@@ -429,14 +439,14 @@
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     });
-        $('.total-' + index).text("$ " + subTotal);
+        $('.total-' + index).text(subTotal + " € (Euro)");
         donates[index]['donate_count'] = value;
         let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(item['donate_amount']), 0);
         totalAmount = totalAmount.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     });
-        $('.total').text('$ ' + totalAmount);
+        $('.total').text(totalAmount + " € (Euro)");
     })
 
     $(".donate-div").on('click', '.btn-sub', function(){
@@ -453,14 +463,14 @@
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         });
-            $('.total-' + index).text("$ " + subTotal);
+            $('.total-' + index).text(subTotal + " € (Euro)");
             donates[index]['donate_count'] = value;
             let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(item['donate_amount']), 0);
             totalAmount = totalAmount.toLocaleString('en-US', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         });
-            $('.total').text('$ ' + totalAmount);
+            $('.total').text(totalAmount + " € (Euro)");
         }
     })
 
