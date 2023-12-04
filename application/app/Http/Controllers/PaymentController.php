@@ -184,7 +184,7 @@ class PaymentController extends Controller
         }
 
         $sourceId = $request->sourceId;
-        $idempotencyKey = $request->idempotencyKey; // Uuid::uuid4();
+        $idempotencyKey = Uuid::uuid4(); // $request->idempotencyKey;
 
         $email = $request->email;
         $firstName = $request->first_name;
