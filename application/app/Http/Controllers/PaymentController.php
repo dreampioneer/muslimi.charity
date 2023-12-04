@@ -28,7 +28,10 @@ use Square\Models\Builders\CreateSubscriptionRequestBuilder;
 use Square\Models\Builders\SubscriptionPricingBuilder;
 use Square\Models\Builders\CreateOrderRequestBuilder;
 use Square\Models\Builders\OrderBuilder;
+use Square\Models\Builders\CatalogSubscriptionPlanVariationBuilder;
 use Square\Models\Builders\OrderLineItemBuilder;
+use Square\Models\Builders\PhaseBuilder;
+use Square\Models\Builders\CreateCustomerCardRequestBuilder;
 use Square\Models\Currency;
 use Square\Models\OrderLineItemItemType;
 use Square\Models\OrderState;
@@ -181,7 +184,7 @@ class PaymentController extends Controller
         }
 
         $sourceId = $request->sourceId;
-        $idempotencyKey = Uuid::uuid4();;
+        $idempotencyKey = $request->idempotencyKey; // Uuid::uuid4();
 
         $email = $request->email;
         $firstName = $request->first_name;
@@ -235,11 +238,15 @@ class PaymentController extends Controller
                     $customer = $createCustomerResponse->getCustomer();
                     $customerId = $customer->getId();
                 } else {
-                    return response()->json(['status' => 'error', 'msg' => 'Something went wrong!']);
+                    $errors = $apiResponse->getErrors();
+                    $msg = $this->getErrorMsg($errors);
+                    return response()->json(['status' => 'error', 'msg' => $msg]);
                 }
             }
         } else {
-            return response()->json(['status' => 'error', 'msg' => 'Something went wrong!']);
+            $errors = $apiResponse->getErrors();
+            $msg = $this->getErrorMsg($errors);
+            return response()->json(['status' => 'error', 'msg' => $msg]);
         }
 
         $total = 0;
@@ -280,11 +287,126 @@ class PaymentController extends Controller
             $totalAmount = $createOrderResponse->getOrder()->getTotalMoney();
         } else {
             $errors = $apiResponse->getErrors();
-            return response()->json(['status' => 'error', 'msg' => 'Something went wrong!!']);
+            $msg = $this->getErrorMsg($errors);
+            return response()->json(['status' => 'error', 'msg' => $msg]);
         }
 
         if ($request->is_monthly == 'true') {
+            $body = CreateCustomerCardRequestBuilder::init(
+                    $sourceId
+                )
+                ->cardholderName($firstName . ' ' . $lastName)
+                ->build();
 
+            $apiResponse = $customersApi->createCustomerCard(
+                $customerId,
+                $body
+            );
+
+            if ($apiResponse->isSuccess()) {
+                $createCustomerCardResponse = $apiResponse->getResult();
+                $card = $createCustomerCardResponse->getCard();
+            } else {
+                $errors = $apiResponse->getErrors();
+                $msg = $this->getErrorMsg($errors);
+                return response()->json(['status' => 'error', 'msg' => $msg]);
+            }
+
+            $catalogApi = $squareClient->getCatalogApi();
+            $time = time();
+            $body = UpsertCatalogObjectRequestBuilder::init(
+                        $idempotencyKey,
+                        CatalogObjectBuilder::init(
+                            CatalogObjectType::SUBSCRIPTION_PLAN,
+                            "#" . $time
+                        )
+                            ->subscriptionPlanData(
+                                CatalogSubscriptionPlanBuilder::init('SPlan - ' . $time)
+                                    ->phases([
+                                        SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
+                                            ->pricing(
+                                                SubscriptionPricingBuilder::init()
+                                                ->type(SubscriptionPricingType::STATIC_)
+                                                ->build()
+                                            )->build()
+                                ])->build()
+                        )->build()
+                    )->build();
+
+            $apiResponse = $catalogApi->upsertCatalogObject($body);
+
+            if ($apiResponse->isSuccess()) {
+                $upsertCatalogObjectResponse = $apiResponse->getResult();
+                $subscriptionPlanId = $upsertCatalogObjectResponse->getCatalogObject()->getId();
+            } else {
+                $errors = $apiResponse->getErrors();
+                $msg = $this->getErrorMsg($errors);
+                return response()->json(['status' => 'error', 'msg' => $msg]);
+            }
+
+            $idempotencyKey = Uuid::uuid4();
+
+            $body = UpsertCatalogObjectRequestBuilder::init(
+                        $idempotencyKey,
+                        CatalogObjectBuilder::init(
+                            CatalogObjectType::SUBSCRIPTION_PLAN_VARIATION,
+                            "#" . $time
+                        )
+                            ->subscriptionPlanVariationData(
+                                CatalogSubscriptionPlanVariationBuilder::init('SPlan Variation - ' . $time, [
+                                        SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
+                                            ->pricing(
+                                                SubscriptionPricingBuilder::init()
+                                                ->type(SubscriptionPricingType::RELATIVE)
+                                                ->build()
+                                            )
+                                            ->build()
+                                    ])
+                                    ->subscriptionPlanId($subscriptionPlanId)
+                                    ->build()
+                            )->build()
+                    )->build();
+
+            $apiResponse = $catalogApi->upsertCatalogObject($body);
+
+            if ($apiResponse->isSuccess()) {
+                $upsertCatalogObjectResponse = $apiResponse->getResult();
+                $subscriptionPlanVariationId = $upsertCatalogObjectResponse->getCatalogObject()->getId();
+            } else {
+                $errors = $apiResponse->getErrors();
+                $msg = $this->getErrorMsg($errors);
+                return response()->json(['status' => 'error', 'msg' => $msg]);
+            }
+
+            $subscriptionsApi = $squareClient->getSubscriptionsApi();
+
+            $body = CreateSubscriptionRequestBuilder::init(
+                env('SQUARE_LOCATION_ID'),
+                $customerId
+            )
+                ->idempotencyKey($idempotencyKey)
+                ->planVariationId($subscriptionPlanVariationId)
+                ->cardId($card->getId())
+                ->phases(
+                    [
+                        PhaseBuilder::init()
+                            ->ordinal(0)
+                            ->orderTemplateId($orderId)
+                            ->build()
+                    ]
+                )
+                ->build();
+
+            $apiResponse = $subscriptionsApi->createSubscription($body);
+
+            if ($apiResponse->isSuccess()) {
+                $createSubscriptionResponse = $apiResponse->getResult();
+                $paymentId = $createSubscriptionResponse->getSubscription()->getId();
+            } else {
+                $errors = $apiResponse->getErrors();
+                $msg = $this->getErrorMsg($errors);
+                return response()->json(['status' => 'error', 'msg' => $msg]);
+            }
         }else{
             $paymentsApi = $squareClient->getPaymentsApi();
 
@@ -312,14 +434,7 @@ class PaymentController extends Controller
                 $paymentId = $createPaymentResponse->getPayment()->getId();
             } else {
                 $errors = $apiResponse->getErrors();
-                $msg = '';
-                foreach ($errors as $error) {
-                    $errorDetail = $error->getDetail();
-                    $errorDetail = str_replace('_', ' ', $errorDetail);
-                    $errorCategory = $error->getCategory();
-                    $errorCategory = str_replace('_', ' ', $errorCategory);
-                    $msg = $msg . "Error Type: $errorCategory, Detail: $errorDetail\n";
-                }
+                $msg = $this->getErrorMsg($errors);
                 return response()->json(['status' => 'error', 'msg' => $msg]);
             }
         }
@@ -356,67 +471,141 @@ class PaymentController extends Controller
         return response()->json($data);
     }
 
-    public function squareTest(){
-        $idempotencyKey = Uuid::uuid4();
-
-        $squareClient = new SquareClient([
-            'accessToken' => env('SQUARE_ACCESS_TOKEN'),
-            'environment' => env('SQUARE_ENVIRONMENT'),
-        ]);
-
-        $catalogApi = $squareClient->getCatalogApi();
-        $time = time();
-        $body = UpsertCatalogObjectRequestBuilder::init(
-                    $idempotencyKey,
-                    CatalogObjectBuilder::init(
-                        CatalogObjectType::SUBSCRIPTION_PLAN,
-                        "#" . $time
-                    )
-                        ->subscriptionPlanData(
-                            CatalogSubscriptionPlanBuilder::init('Plan' . $time)
-                                ->phases([
-                                    SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
-                                        ->pricing(
-                                            SubscriptionPricingBuilder::init()
-                                            ->type(SubscriptionPricingType::STATIC_)
-                                            ->build()
-                                        )->build()
-                            ])->build()
-                    )->build()
-                )->build();
-
-        $apiResponse = $catalogApi->upsertCatalogObject($body);
-
-        if ($apiResponse->isSuccess()) {
-            $upsertCatalogObjectResponse = $apiResponse->getResult();
-        } else {
-            $errors = $apiResponse->getErrors();
+    function getErrorMsg($errors){
+        $msg = [];
+        foreach ($errors as $error) {
+            $errorDetail = $error->getDetail();
+            $errorDetail = str_replace('_', ' ', $errorDetail);
+            $errorCategory = $error->getCategory();
+            $errorCategory = str_replace('_', ' ', $errorCategory);
+            array_push($msg, "Error Type: $errorCategory, Detail: $errorDetail");
+            return $msg;
         }
-
-        // echo json_encode();
-
-        // $planVariationId = $upsertCatalogObjectResponse->getId();
-
-        // $body = CreateSubscriptionRequestBuilder::init(
-        //     env('SQUARE_LOCATION_ID'),
-        //     'KPNX3NEX3BS18JF52VK7HX4T8R'
-        // )
-        //     ->idempotencyKey($idempotencyKey)
-        //     ->planVariationId($planVariationId)
-        //     ->cardId('ccof:qy5x8hHGYsgLrp4Q4GB')
-        //     ->timezone('America/Los_Angeles')
-        //     ->build();
-
-        // $apiResponse = $subscriptionsApi->createSubscription($body);
-
-        // if ($apiResponse->isSuccess()) {
-        //     $createSubscriptionResponse = $apiResponse->getResult();
-        // } else {
-        //     $errors = $apiResponse->getErrors();
-        // }
-
-        // // Getting more response information
-        // var_dump($apiResponse->getStatusCode());
-        // var_dump($apiResponse->getHeaders());
     }
+
+    // public function squareTest(){
+    //     $idempotencyKey = Uuid::uuid4();
+
+    //     $squareClient = new SquareClient([
+    //         'accessToken' => env('SQUARE_ACCESS_TOKEN'),
+    //         'environment' => env('SQUARE_ENVIRONMENT'),
+    //     ]);
+
+    //     $catalogApi = $squareClient->getCatalogApi();
+    //     $time = time();
+    //     $body = UpsertCatalogObjectRequestBuilder::init(
+    //                 $idempotencyKey,
+    //                 CatalogObjectBuilder::init(
+    //                     CatalogObjectType::SUBSCRIPTION_PLAN,
+    //                     "#" . $time
+    //                 )
+    //                     ->subscriptionPlanData(
+    //                         CatalogSubscriptionPlanBuilder::init('SPlan - ' . $time)
+    //                             ->phases([
+    //                                 SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
+    //                                     ->pricing(
+    //                                         SubscriptionPricingBuilder::init()
+    //                                         ->type(SubscriptionPricingType::STATIC_)
+    //                                         ->build()
+    //                                     )->build()
+    //                         ])->build()
+    //                 )->build()
+    //             )->build();
+
+    //     $apiResponse = $catalogApi->upsertCatalogObject($body);
+
+    //     if ($apiResponse->isSuccess()) {
+    //         $upsertCatalogObjectResponse = $apiResponse->getResult();
+    //         $subscriptionPlanId = $upsertCatalogObjectResponse->getCatalogObject()->getId();
+    //     } else {
+    //         $errors = $apiResponse->getErrors();
+    //     }
+
+    //     $idempotencyKey = Uuid::uuid4();
+
+    //     $body = UpsertCatalogObjectRequestBuilder::init(
+    //                 $idempotencyKey,
+    //                 CatalogObjectBuilder::init(
+    //                     CatalogObjectType::SUBSCRIPTION_PLAN_VARIATION,
+    //                     "#" . $time
+    //                 )
+    //                     ->subscriptionPlanVariationData(
+    //                         CatalogSubscriptionPlanVariationBuilder::init('SPlan Variation - ' . $time, [
+    //                                 SubscriptionPhaseBuilder::init(SubscriptionCadence::MONTHLY)
+    //                                     ->pricing(
+    //                                         SubscriptionPricingBuilder::init()
+    //                                         ->type(SubscriptionPricingType::RELATIVE)
+    //                                         ->build()
+    //                                     )
+    //                                     ->build()
+    //                             ])
+    //                             ->subscriptionPlanId($subscriptionPlanId)
+    //                             ->build()
+    //                     )->build()
+    //             )->build();
+
+    //     $apiResponse = $catalogApi->upsertCatalogObject($body);
+
+    //     if ($apiResponse->isSuccess()) {
+    //         $upsertCatalogObjectResponse = $apiResponse->getResult();
+    //         $subscriptionPlanVariationId = $upsertCatalogObjectResponse->getCatalogObject()->getId();
+    //     } else {
+    //         $errors = $apiResponse->getErrors();
+    //     }
+
+    //     echo json_encode($subscriptionPlanVariationId);
+
+    //     $subscriptionsApi = $squareClient->getSubscriptionsApi();
+
+    //     $body = CreateSubscriptionRequestBuilder::init(
+    //         env('SQUARE_LOCATION_ID'),
+    //         'CHFGVKYY8RSV93M5KCYTG4PN0G'
+    //     )
+    //         ->idempotencyKey($idempotencyKey)
+    //         ->planVariationId('6JHXF3B2CW3YKHDV4XEM674H')
+    //         ->cardId('ccof:qy5x8hHGYsgLrp4Q4GB')
+    //         ->phases(
+    //             [
+    //                 PhaseBuilder::init()
+    //                     ->ordinal(0)
+    //                     ->orderTemplateId($subscriptionPlanVariationId)
+    //                     ->build()
+    //             ]
+    //         )
+    //         ->build();
+
+    //     $apiResponse = $subscriptionsApi->createSubscription($body);
+
+    //     if ($apiResponse->isSuccess()) {
+    //         $createSubscriptionResponse = $apiResponse->getResult();
+    //     } else {
+    //         $errors = $apiResponse->getErrors();
+    //     }
+
+    //     // echo json_encode();
+
+    //     // $planVariationId = $upsertCatalogObjectResponse->getId();
+
+    //     // $body = CreateSubscriptionRequestBuilder::init(
+    //     //     env('SQUARE_LOCATION_ID'),
+    //     //     'KPNX3NEX3BS18JF52VK7HX4T8R'
+    //     // )
+    //     //     ->idempotencyKey($idempotencyKey)
+    //     //     ->planVariationId($planVariationId)
+    //     //     ->cardId('ccof:qy5x8hHGYsgLrp4Q4GB')
+    //     //     ->timezone('America/Los_Angeles')
+    //     //     ->build();
+
+    //     // $apiResponse = $subscriptionsApi->createSubscription($body);
+
+    //     // if ($apiResponse->isSuccess()) {
+    //     //     $createSubscriptionResponse = $apiResponse->getResult();
+    //     // } else {
+    //     //     $errors = $apiResponse->getErrors();
+    //     // }
+
+    //     // // Getting more response information
+    //     // var_dump($apiResponse->getStatusCode());
+    //     // var_dump($apiResponse->getHeaders());
+    // }
 }
