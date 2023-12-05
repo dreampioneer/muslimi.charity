@@ -56,8 +56,8 @@
             if(data.status === 'requires_action'){
                 var iframe = document.createElement('iframe');
                 iframe.src = data.next_action.redirect_to_url.url;;
-                iframe.width = 600;
-                iframe.height = 400;
+                iframe.width = 500;
+                iframe.height = 6
                 $('.test').append(iframe);
             }else if(data.status === 'succeeded'){
                 msg = "Payment succeeded!";

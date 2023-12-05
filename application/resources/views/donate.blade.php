@@ -260,6 +260,15 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="3ds_modal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="3ds_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: auto">
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+</div>
 @endsection
 @section('script')
     <script src="{{ asset('assets/vendor/jquery.mask.min.js') }}"></script>
@@ -268,9 +277,13 @@
     <script src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript">
     Stripe.setPublishableKey('{{ env("STRIPE_KEY") }}');
-    const stripe = Stripe('pk_test_VOOyyYjgzqdm8I3SrBqmh9qY');
+    const stripe = Stripe('{{ env("STRIPE_KEY") }}');
     var flag = true;
     $(document).ready(function(){
+        $('#3ds_modal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
         $(".donate-detail-div").hide();
         $(".bill-detial").hide();
         $(".btn-cancel").hide();
@@ -651,7 +664,7 @@
             let is_zakat = $('#is_zakat').prop('checked');
             let is_monthly = $('#is_monthly').prop('checked');
             $.ajax({
-                url: "{{ route('stripe.store') }}",
+                url: "{{ route('stripe.createPaymentIntent') }}",
                 method: 'POST',
                 data: {
                     stripeToken,
@@ -667,35 +680,127 @@
                     is_monthly
                 },
                 success: function(res){
-                    if(res.status == 'success'){
-                        window.location.href = res.return_url;
+                    let data = JSON.parse(res);
+                    if(data.status === 'requires_action'){
+                        var iframe = document.createElement('iframe');
+                        iframe.src = data.next_action.redirect_to_url.url;;
+                        iframe.width = 500;
+                        iframe.height = 600;
+                        $('.modal-body').html(iframe);
+                        $("#3ds_modal").modal("show");
+                        return;
+                    }else if(data.status === 'succeeded'){
+                        createDonateHistory(data.id);
+                    }else if(data.status === 'processing'){
+                        showToast("success", "Your payment is processing.");
+                    }else if(data.status === 'requires_payment_method'){
+                        showToast("error", "Your payment was not successful, please try again.");
                     }else{
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top-end",
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: res.status,
-                            title: res.msg,
-                        });
+                        showToast("error", "Something went wrong.");
                     }
-                    $(".btn-donate").attr('disabled', false);
-                    $(".btn-donate").html('Donate Now');
                 },
-                error: function(){
-                    alert("Something went wrong. Please try again!");
-                    $(".btn-donate").attr('disabled', false);
-                    $(".btn-donate").html('Donate Now');
+                error: function(error){
+                    showToast("error", error.responseJSON.message);
                 }
             })
         }
     }
+
+    async function on3DSComplete(client_secret) {
+        $("#3ds_modal").modal("hide");
+        $('.modal-body').html('');
+
+        const { paymentIntent } = await stripe.retrievePaymentIntent(client_secret);
+
+        switch (paymentIntent.status) {
+            case "succeeded":
+                createDonateHistory(paymentIntent.id);
+            break;
+            case "processing":
+                showToast("success", "Your payment is processing.");
+            break;
+            case "requires_payment_method":
+                showToast("error", "Your payment was not successful, please try again.");
+            break;
+            case "requires_confirmation":
+                const response = await fetch("{{ route('stripe.confirmPaymentIntent') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    body: JSON.stringify({paymentIntentId: paymentIntent.id}),
+                });
+                const data = await response.json();
+                if(data.status === "succeeded"){
+                    createDonateHistory(paymentIntent.id);
+                }else{
+                    showToast("error", "Something went wrong.");
+                }
+            break;
+            default:
+                showToast("error", "Something went wrong.");
+            break;
+
+        }
+    }
+
+    function showToast(status, msg){
+        const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: msg,
+            });
+        $(".btn-donate").attr('disabled', false);
+        $(".btn-donate").html('Donate Now');
+    }
+
+    function createDonateHistory(payment_intent_id){
+        let first_name = $('#first-name').val();
+        let last_name = $('#last-name').val();
+        let email = $('#email').val();
+        let dedicate_this_donation = $('#dedicate-this-donation').val();
+        let is_zakat = $('#is_zakat').prop('checked');
+        let is_monthly = $('#is_monthly').prop('checked');
+        $.ajax({
+                url: "{{ route('stripe.createDonateHistory') }}",
+                method: 'POST',
+                data: {
+                    first_name,
+                    last_name,
+                    email,
+                    dedicate_this_donation,
+                    is_zakat,
+                    donates,
+                    is_monthly,
+                    payment_intent_id
+                },
+                success: function(res){
+                    window.location.href = res.return_url;
+                },
+                error: function(){
+                    showToast("error", "Something went wrong.");
+                }
+            })
+    }
+
+    window.addEventListener('message', function(ev) {
+        if (typeof ev.data.status !== 'undefined' && ev.data.status === '3DS-authentication-complete') {
+            console.log(ev.data.clientSecret);
+            if(ev.data.clientSecret){
+                on3DSComplete(ev.data.clientSecret);
+            }
+        }
+    }, false);
 </script>
 @endsection
