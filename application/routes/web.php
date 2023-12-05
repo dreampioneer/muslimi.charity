@@ -31,8 +31,11 @@ Route::name('stripe.')
     ->controller(PaymentController::class)
     ->prefix('stripe')
     ->group(function () {
-        // Route::get('/payment', 'index')->name('index');
+        Route::get('/payment', 'index')->name('index');
         Route::post('/payment', 'store')->name('store');
+        Route::post('/confirm-payment', 'confirmPayment')->name('confirmPayment');
+        Route::post('/create-payment', 'createPaymentIntents')->name('createPaymentIntents');
+        Route::get('/3ds', 'threeDS')->name('threeDS');
     });
 
 Route::name('faq.')

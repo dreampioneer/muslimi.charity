@@ -15,7 +15,43 @@ class PaymentController extends Controller
 {
     public function index()
     {
+        // $stripe = new StripeClient(env('STRIPE_SECRET'));
+        // $paymentIntent = $stripe->paymentIntents->create([
+        //     'amount' => 1099,
+        //     'currency' => 'usd',
+        //     // 'automatic_payment_methods' => ['enabled' => true],
+        //     'confirmation_method' => 'manual',
+        //   ]);
         return view('stripe.index');
+    }
+
+    function confirmPayment(Request $request){
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
+        $stripe->paymentIntents->confirm($request->paymentIntentId,
+        [
+            'return_url' => route('stripe.index'),
+        ]);
+        $paymentIntent = $stripe->paymentIntents->retrieve($request->paymentIntentId);
+        return json_encode($paymentIntent);
+    }
+
+    function createPaymentIntents(Request $request){
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
+        $paymentIntent = $stripe->paymentIntents->create([
+            'amount' => 1999,  // Replace with your desired amount in cents
+            'currency' => 'eur',
+            'confirmation_method' => 'manual',
+            'confirm' => true,
+            'payment_method_data' => [
+                'type' => 'card',
+                'card' => [
+                    'token' => $request->card_token,  // Card token from your frontend
+                ],
+            ],
+            'return_url' => route('stripe.threeDS'),
+        ]);
+
+        return json_encode($paymentIntent);
     }
 
     public function store(Request $request)
@@ -135,5 +171,9 @@ class PaymentController extends Controller
         } catch (CardException $th) {
             return response()->json(['status' => 'error', 'msg' => $th->getMessage()]);
         }
+    }
+
+    public function threeDS(){
+        return view('stripe.3ds');
     }
 }
