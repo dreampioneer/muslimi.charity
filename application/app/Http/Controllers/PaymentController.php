@@ -15,13 +15,6 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        // $stripe = new StripeClient(env('STRIPE_SECRET'));
-        // $paymentIntent = $stripe->paymentIntents->create([
-        //     'amount' => 1099,
-        //     'currency' => 'usd',
-        //     // 'automatic_payment_methods' => ['enabled' => true],
-        //     'confirmation_method' => 'manual',
-        //   ]);
         return view('stripe.index');
     }
 
@@ -111,7 +104,43 @@ class PaymentController extends Controller
         }
 
         if ($request->is_monthly == 'true') {
+            $items = [];
+            foreach ($request->donates as $donate) {
+                array_push($items, [
+                    'price' => $donate['donate_price_id'],
+                    'quantity' => intval($donate['donate_count'])
+                ]);
+            }
 
+            $paymentMethod = $stripe->paymentMethods->create([
+                'type' => 'card',
+                'card' => [
+                    'token' => $request->stripeToken,
+                ],
+            ]);
+
+            $paymentMethod = $stripe->paymentMethods->attach(
+                $paymentMethod->id,
+                ['customer' => $customer->id]
+            );
+
+            $subscription = $stripe->subscriptions->create([
+                'customer' => $customer->id,
+                'items' => [['price' => 'price_1OAvh3CJAyesaXH9ZFnDI3J1']],
+                'off_session' => true,
+                'payment_behavior' => 'allow_incomplete',
+                'payment_settings' => [
+                    'save_default_payment_method' => 'on_subscription'
+                ],
+                'default_payment_method' => $paymentMethod->id,
+                'expand' => ['latest_invoice.payment_intent'],
+                "description" => $request->dedicate_this_donation ? "Double-Time Donate - " . $request->dedicate_this_donation : "Double-Time Donate",
+            ]);
+            $paymentIntent = $stripe->paymentIntents->retrieve($subscription->latest_invoice->payment_intent->id);
+            $paymentIntent->confirm([
+                'return_url' => route('stripe.threeDS'),
+            ]);
+            return json_encode($paymentIntent);
         } else {
 
             $paymentIntent = $stripe->paymentIntents->create([
