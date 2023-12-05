@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DonateHistory;
 use Illuminate\Http\Request;
 use Artesaos\SEOTools\Facades\SEOTools;
-
+use Stevebauman\Location\Facades\Location;
 class HomeController extends Controller
 {
     public function index(){
@@ -18,7 +18,7 @@ class HomeController extends Controller
         return view('home');
     }
 
-    public function donate(){
+    public function donate(Request $request){
         SEOTools::setTitle('Donate - MUSLIMI');
         SEOTools::setDescription(config('constants.home_content'));
         SEOTools::opengraph()->setUrl(route("home.donate"));
@@ -26,7 +26,16 @@ class HomeController extends Controller
         SEOTools::opengraph()->addProperty('type', 'donate');
         SEOTools::jsonLd()->addImage(asset('assets/img/home.png'));
         $donates = DonateHistory::orderBy('created_at', 'desc')->limit(5)->get();
-        return view('donate', ['donates' => $donates]);
+        if(env('APP_ENV') !== 'production'){
+            $ip = "154.21.209.10"; // $request->ip();
+        }else{
+            $ip = $request->ip();
+        }
+        $currentUserInfo = Location::get($ip);
+        return view('donate', [
+            'donates' => $donates,
+            'currentUserInfo' => $currentUserInfo
+        ]);
     }
 
     public function thanks($donate_history_id){

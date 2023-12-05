@@ -11,7 +11,9 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "monarobase/country-list": "^3.4",
         "spatie/laravel-analytics": "^5.1",
+        "stevebauman/location": "^7.0",
         "stripe/stripe-php": "^13.2"
     },
     "require-dev": {
