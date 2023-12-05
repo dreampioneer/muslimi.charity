@@ -104,10 +104,16 @@ class PaymentController extends Controller
         }
 
         if ($request->is_monthly == 'true') {
+            $products = $stripe->products->all();
+            $priceIds = [];
+            foreach($products as $product ){
+                $priceIds[$product->name] = $product->default_price;
+            }
+
             $items = [];
             foreach ($request->donates as $donate) {
                 array_push($items, [
-                    'price' => $donate['donate_price_id'],
+                    'price' => $priceIds[$donate['donate_name']],
                     'quantity' => intval($donate['donate_count'])
                 ]);
             }
@@ -126,7 +132,7 @@ class PaymentController extends Controller
 
             $subscription = $stripe->subscriptions->create([
                 'customer' => $customer->id,
-                'items' => [['price' => 'price_1OAvh3CJAyesaXH9ZFnDI3J1']],
+                'items' => $items,
                 'off_session' => true,
                 'payment_behavior' => 'allow_incomplete',
                 'payment_settings' => [
@@ -137,9 +143,11 @@ class PaymentController extends Controller
                 "description" => $request->dedicate_this_donation ? "Double-Time Donate - " . $request->dedicate_this_donation : "Double-Time Donate",
             ]);
             $paymentIntent = $stripe->paymentIntents->retrieve($subscription->latest_invoice->payment_intent->id);
-            $paymentIntent->confirm([
-                'return_url' => route('stripe.threeDS'),
-            ]);
+            if($paymentIntent->status === 'requires_action'){
+                $paymentIntent->confirm([
+                    'return_url' => route('stripe.threeDS'),
+                ]);
+            }
             return json_encode($paymentIntent);
         } else {
 
