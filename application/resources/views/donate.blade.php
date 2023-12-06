@@ -202,8 +202,7 @@
                                     <div class="">
                                         <label for="" class="form-label">Expiry Date&nbsp;<span
                                                 class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="expirey-date" name="expirey_date"
-                                            placeholder="mm/yy">
+                                        <input type="text" class="form-control" id="expirey-date" name="expirey_date" placeholder="mm/yy">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -218,24 +217,23 @@
                             <div class="row my-4">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="" class="form-label">Country or region&nbsp;<span
+                                        <label for="" class="form-label">Country&nbsp;<span
                                                 class="text-danger">*</span></label>
                                         @php
                                             $countries = config("constants.countries");
                                         @endphp
                                         <select class="form-control" id="country" name="country">
                                             @foreach ($countries as $country)
-                                                <option value="{{ $country['value'] }}" @if($country['value'] == $currentUserInfo->countryCode) selected @endif>{{ $country['label'] }}</option>
+                                                <option value="{{ $country['value'] }}">{{ $country['label'] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="@if($currentUserInfo->countryCode !== 'GB' && $currentUserInfo->countryCode !== 'CA' && $currentUserInfo->countryCode !== 'US' ) d-none @endif">
-                                        <label for="" class="form-label">@if($currentUserInfo->countryCode == 'GB' || $currentUserInfo->countryCode == 'CA') Postal Code @elseif($currentUserInfo->countryCode == 'US') Zip Code @endif&nbsp;<span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="postal-code" name="postal_code"
-                                            placeholder="@if($currentUserInfo->countryCode == 'GB' || $currentUserInfo->countryCode == 'CA') Postal Code @elseif($currentUserInfo->countryCode == 'US')Zip Code @endif">
+                                <div class="col-md-6 code-div">
+                                    <div>
+                                        <label for="" class="form-label">&nbsp;<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control text-uppercase" id="code" name="code"
+                                            placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -326,6 +324,7 @@
     <script src="https://js.stripe.com/v2/"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript">
+        const userInfo = {{ Js::from($currentUserInfo) }};
         Stripe.setPublishableKey('{{ env('STRIPE_KEY') }}');
         const stripe = Stripe('{{ env('STRIPE_KEY') }}');
         var flag = true;
@@ -338,9 +337,19 @@
             $(".bill-detial").hide();
             $(".btn-cancel").hide();
             $('#card-number').mask('0000 0000 0000 0000');
-            $('#expirey-date').mask('00/00');
+            $('#expirey-date').inputmask({
+                mask: ['99/99'],
+                placeholder: 'mm/yy',
+                inputFormat: 'mm/yy',
+                regex: '^((0[1-9])|(1[0-2]))/\\d{2}$'
+            });
             $('#cvc').mask('0000');
-            $('#postal-code"').mask('00000');
+            country = "AF";
+            if(userInfo !== false){
+                country = userInfo.countryCode;
+            }
+            $('#country').val(country);
+            $('#country').trigger('change');
         })
         // Donate
         var donates = [];
@@ -582,6 +591,7 @@
                 $('#card-number').trigger('change');
                 $('#expirey-date').trigger('change');
                 $('#cvc').trigger('change');
+                $('#code').trigger('change');
                 let invalidCount = $('.bill-detial').find('.is-invalid').length;
                 if (!invalidCount) {
                     let ccNum = $('#card-number').val();
@@ -653,15 +663,36 @@
 
         $('#cvc').change(function() {
             let cvcNum = $(this).val();
-            let flag = validateCVC(cvcNum);
+            validateCVC(cvcNum);
             return true;
         });
 
-        $('#postal-code').change(function() {
-            let postalCode = $(this).val();
-            let flag = validatePost(cvcNum);
+        $('#code').change(function() {
+            let code = $(this).val();
+            validateCode(code);
             return true;
         });
+
+        $('#country').change(function(){
+            let country = $(this).find("option:selected").val();
+            console.log(country);
+            if(country == 'GB' || country == 'US' || country == 'CA'){
+                $('.code-div').show();
+                if(country == 'US'){
+                    $('.code-div label').text('Zip Code');
+                    $('.code-div input').attr('placeholder', 'Zip Code');
+                    $("#code").val('');
+                    $("#code").mask('00000');
+                }else{
+                    $('.code-div label').text('Postal Code');
+                    $('.code-div input').attr('placeholder', 'Postal Code');
+                    $("#code").val('');
+                    $("#code").unmask();
+                }
+            }else{
+                $('.code-div').hide();
+            }
+        })
 
         function validateRequired(selector, value) {
             if (!value.length) {
@@ -707,12 +738,21 @@
             }
         }
 
-        function validatePostalCode(postalCode){
-
-        }
-
-        function validateZipCode(zipCode){
-
+        function validateCode(code){
+            let country = $(this).find("option:selected").val();
+            if(country == 'US'){
+                if(!code.length  || code.length !== 5){
+                    reportError('code', 'The zip code appears to be invalid.');
+                }else{
+                    reportSuccess('code');
+                }
+            }else{
+                if(!code.length){
+                    reportError('code', 'The postal code appears to be invalid.');
+                }else{
+                    reportSuccess('code');
+                }
+            }
         }
 
         function reportError(selector, msg) {
