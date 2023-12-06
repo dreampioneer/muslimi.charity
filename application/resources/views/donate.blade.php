@@ -47,7 +47,7 @@
                     $donateFoods = [
                         [
                             'priceId' => 'price_1OAvfgCJAyesaXH9OhRu0Dej',
-                            'donate_name' => "Supply a family with a month's supply of Hot Meal",
+                            'donate_name' => "Supply a family with a month's supply of Hot Meals",
                             'amount' => 56,
                         ],
                         [
