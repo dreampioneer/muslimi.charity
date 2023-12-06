@@ -600,11 +600,18 @@
                     expDate = expDate.split('/');
                     let expMonth = expDate[0];
                     let expYear = expDate[1];
+                    let country = $(this).find("option:selected").val();
+                    let code = '';
+                    if(country == 'GB' || country == 'US' || country == 'CA'){
+                        code = $("#code").val();
+                    }
                     Stripe.card.createToken({
                         number: ccNum,
                         cvc: cvcNum,
                         exp_month: expMonth,
-                        exp_year: expYear
+                        exp_year: expYear,
+                        address_country: country,
+                        address_zip: code
                     }, stripeResponseHandler);
                     return;
                 } else {
@@ -679,13 +686,13 @@
             if(country == 'GB' || country == 'US' || country == 'CA'){
                 $('.code-div').show();
                 if(country == 'US'){
-                    $('.code-div label').text('Zip Code');
-                    $('.code-div input').attr('placeholder', 'Zip Code');
+                    $('.code-div label').text('Zip');
+                    $('.code-div input').attr('placeholder', '12345');
                     $("#code").val('');
                     $("#code").mask('00000');
                 }else{
                     $('.code-div label').text('Postal Code');
-                    $('.code-div input').attr('placeholder', 'Postal Code');
+                    $('.code-div input').attr('placeholder', 'WS11 1DB');
                     $("#code").val('');
                     $("#code").unmask();
                 }
@@ -742,7 +749,7 @@
             let country = $(this).find("option:selected").val();
             if(country == 'US'){
                 if(!code.length  || code.length !== 5){
-                    reportError('code', 'The zip code appears to be invalid.');
+                    reportError('code', 'The zip appears to be invalid.');
                 }else{
                     reportSuccess('code');
                 }
