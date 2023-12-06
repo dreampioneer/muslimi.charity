@@ -777,8 +777,7 @@
 
         function stripeResponseHandler(status, response) {
             if (response.error) {
-                $(".btn-donate").attr('disabled', false);
-                $(".btn-donate").html('Donate Now');
+                showToast("error", response.error.message);
             } else {
                 var stripeToken = response['id'];
                 let card_number = $('#card-number').val();
