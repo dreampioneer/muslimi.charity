@@ -340,6 +340,7 @@
             $('#card-number').mask('0000 0000 0000 0000');
             $('#expirey-date').mask('00/00');
             $('#cvc').mask('0000');
+            $('#postal-code"').mask('00000');
         })
         // Donate
         var donates = [];
@@ -656,6 +657,12 @@
             return true;
         });
 
+        $('#postal-code').change(function() {
+            let postalCode = $(this).val();
+            let flag = validatePost(cvcNum);
+            return true;
+        });
+
         function validateRequired(selector, value) {
             if (!value.length) {
                 reportError(selector, 'The ' + selector.replace('-', ' ') + ' appears to be invalid.');
@@ -698,6 +705,14 @@
             } else {
                 reportSuccess('cvc');
             }
+        }
+
+        function validatePostalCode(postalCode){
+
+        }
+
+        function validateZipCode(zipCode){
+
         }
 
         function reportError(selector, msg) {
