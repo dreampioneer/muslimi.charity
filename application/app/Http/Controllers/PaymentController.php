@@ -133,7 +133,7 @@ class PaymentController extends Controller
             $subscription = $stripe->subscriptions->create([
                 'customer' => $customer->id,
                 'items' => $items,
-                'off_session' => true,
+                'off_session' => false,
                 'payment_behavior' => 'allow_incomplete',
                 'payment_settings' => [
                     'save_default_payment_method' => 'on_subscription'
@@ -178,6 +178,12 @@ class PaymentController extends Controller
             'return_url' => route('stripe.index'),
         ]);
         $paymentIntent = $stripe->paymentIntents->retrieve($request->paymentIntentId);
+        if(!is_null($paymentIntent->invoice)){
+            $invoice = $stripe->invoices->retrieve($paymentIntent->invoice);
+            if(!is_null($invoice->subscription)){
+                $stripe->subscriptions->update($invoice->subscription, ['off_session' => true]);
+            }
+        }
         return json_encode($paymentIntent);
     }
 
