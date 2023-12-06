@@ -200,10 +200,10 @@
                             <div class="row my-4">
                                 <div class="col-md-6">
                                     <div class="">
-                                        <label for="" class="form-label">Expirey Date&nbsp;<span
+                                        <label for="" class="form-label">Expiry Date&nbsp;<span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="expirey-date" name="expirey_date"
-                                            placeholder="Expirey Date">
+                                            placeholder="mm/yy">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
