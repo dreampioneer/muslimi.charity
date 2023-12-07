@@ -2,7 +2,7 @@
     return [
         'home_content' => "We are a group of Muslim volunteers based in Egypt.<br>
             Our volunteers are delivering aid to the Gaza bombardment victims via Rafah border crossing between Egypt and Gaza.<br>
-            ⚠ The overall death toll in Gaza is 15,000+ (40% are children), with over 7,000 missing and over 40,000 injured. 2.3 million people are at risk.<br>
+            ⚠ The overall death toll in Gaza is :dead:+ (40% are children), with over :missing:+ missing and over :wound:+ injured. 2.3 million people are at risk.<br>
             Muslimi is working to ensure your aid is delivered in Gaza. Your donation is an Amana, which will reach our volunteers on the ground in Egypt and Gaza.<br>
             The Rafah border crossing between Egypt and Gaza has opened to let needed aid flow to Palestinians running short of food, medicine, and water in Gaza.<br>
             Your donation right now can be the lifeline for many in Gaza. Let's unite in this hour of dire need and show that the Ummah stands united with the innocent civilians in Gaza.<br>

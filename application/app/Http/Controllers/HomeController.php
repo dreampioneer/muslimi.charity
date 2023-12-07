@@ -6,6 +6,7 @@ use App\Models\DonateHistory;
 use Illuminate\Http\Request;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Stevebauman\Location\Facades\Location;
+use App\Models\ContentInfo;
 class HomeController extends Controller
 {
     public function index(){
@@ -15,7 +16,8 @@ class HomeController extends Controller
         SEOTools::setCanonical(route("home.index"));
         SEOTools::opengraph()->addProperty('type', 'home');
         SEOTools::jsonLd()->addImage([asset('assets/img/home.png'), asset('assets/video/What_are_the_Rules_of_War_thumbnail.jpg')]);
-        return view('home');
+        $contentInfo = ContentInfo::orderBy('created_at', 'desc')->first();
+        return view('home', ['contentInfo' => $contentInfo]);
     }
 
     public function donate(Request $request){
@@ -32,9 +34,11 @@ class HomeController extends Controller
             $ip = $request->ip();
         }
         $currentUserInfo = Location::get($ip);
+        $contentInfo = ContentInfo::orderBy('created_at', 'desc')->first();
         return view('donate', [
             'donates' => $donates,
-            'currentUserInfo' => $currentUserInfo
+            'currentUserInfo' => $currentUserInfo,
+            'contentInfo' => $contentInfo
         ]);
     }
 

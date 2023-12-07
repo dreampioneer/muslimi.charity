@@ -11,7 +11,7 @@
             </div>
             <div class="col-md-6 ps-4">
                 <p class="text-dark">
-                    {!! config('constants.home_content') !!}
+                    {!! str_replace([":dead:", ":missing:", ":wound:"], [number_format($contentInfo->killed, 0, null, ', '), number_format($contentInfo->missing, 0, null, ', '), number_format($contentInfo->wounded, 0, null, ', ')], config('constants.home_content')) !!}
                 </p>
             </div>
         </div>
