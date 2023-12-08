@@ -832,17 +832,50 @@
             }
         }
 
-        async function on3DSComplete(client_secret) {
-            $("#3ds_modal").modal("hide");
-            $('.modal-body').html('');
-
-            const {
-                paymentIntent
-            } = await stripe.retrievePaymentIntent(client_secret);
-
-            switch (paymentIntent.status) {
+        async function on3DSComplete(type, client_secret) {
+            let intent = '';
+            if(type == 'paymentIntent'){
+                const { paymentIntent } = await stripe.retrievePaymentIntent(client_secret);
+                intent = paymentIntent;
+            }
+            if(type == 'setupIntent'){
+                const { setupIntent } = await stripe.retrieveSetupIntent(client_secret);
+                intent = setupIntent;
+            }
+            let first_name = $('#first-name').val();
+            let last_name = $('#last-name').val();
+            let email = $('#email').val();
+            let dedicate_this_donation = $('#dedicate-this-donation').val();
+            let is_zakat = $('#is_zakat').prop('checked');
+            let is_monthly = $('#is_monthly').prop('checked');
+            switch (intent.status) {
                 case "succeeded":
-                    createDonateHistory(paymentIntent.id);
+                    if(type == 'paymentIntent'){
+                        let data = {
+                            first_name,
+                            last_name,
+                            email,
+                            dedicate_this_donation,
+                            is_zakat,
+                            donates,
+                            is_monthly,
+                            payment_intent_id: intent.id
+                        };
+                        createDonateHistory(data);
+                    }
+                    if(type == 'setupIntent'){
+                        let data = {
+                            first_name,
+                            last_name,
+                            email,
+                            dedicate_this_donation,
+                            is_zakat,
+                            donates,
+                            is_monthly,
+                            setup_intent_id: intent.id
+                        };
+                        createSubscription(data);
+                    }
                     break;
                 case "processing":
                     showToast("success", "Your payment is processing.");
@@ -851,27 +884,28 @@
                     showToast("error", "Your payment was not successful, please try again.");
                     break;
                 case "requires_confirmation":
-                    const response = await fetch("{{ route('stripe.confirmPaymentIntent') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        body: JSON.stringify({
-                            paymentIntentId: paymentIntent.id
-                        }),
-                    });
-                    const data = await response.json();
-                    if (data.status === "succeeded") {
-                        createDonateHistory(paymentIntent.id);
-                    } else {
-                        showToast("error", "Something went wrong.");
+                    if(type == 'paymentIntent'){
+                        const response = await fetch("{{ route('stripe.confirmPaymentIntent') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            body: JSON.stringify({
+                                paymentIntentId: intent.id
+                            }),
+                        });
+                        const data = await response.json();
+                        if (data.status === "succeeded") {
+                            createDonateHistory(paymentIntent.id);
+                        } else {
+                            showToast("error", "Something went wrong.");
+                        }
                     }
                     break;
                 default:
                     showToast("error", "Something went wrong.");
                     break;
-
             }
         }
 
@@ -895,26 +929,11 @@
             $(".btn-donate").html('Donate Now');
         }
 
-        function createDonateHistory(payment_intent_id) {
-            let first_name = $('#first-name').val();
-            let last_name = $('#last-name').val();
-            let email = $('#email').val();
-            let dedicate_this_donation = $('#dedicate-this-donation').val();
-            let is_zakat = $('#is_zakat').prop('checked');
-            let is_monthly = $('#is_monthly').prop('checked');
+        function createDonateHistory(data) {
             $.ajax({
                 url: "{{ route('stripe.createDonateHistory') }}",
                 method: 'POST',
-                data: {
-                    first_name,
-                    last_name,
-                    email,
-                    dedicate_this_donation,
-                    is_zakat,
-                    donates,
-                    is_monthly,
-                    payment_intent_id
-                },
+                data: data,
                 success: function(res) {
                     window.location.href = res.return_url;
                 },
@@ -924,11 +943,28 @@
             })
         }
 
+        function createSubscription(data){
+            $.ajax({
+                url: "{{ route('stripe.createSubscription') }}",
+                method: 'POST',
+                data: data,
+                success: function(res) {
+                    // window.location.href = res.return_url;
+                },
+                error: function() {
+                    showToast("error", "Something went wrong.");
+                }
+            })
+        }
+
         window.addEventListener('message', function(ev) {
             if (typeof ev.data.status !== 'undefined' && ev.data.status === '3DS-authentication-complete') {
-                console.log(ev.data.clientSecret);
+                $("#3ds_modal").modal("hide");
+                $('.modal-body').html('');
                 if (ev.data.clientSecret) {
-                    on3DSComplete(ev.data.clientSecret);
+                    console.log(ev.data.type);
+                    console.log(ev.data.clientSecret);
+                    on3DSComplete(ev.data.type, ev.data.clientSecret);
                 }
             }
         }, false);

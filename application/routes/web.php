@@ -35,7 +35,9 @@ Route::name('stripe.')
         Route::post('/payment', 'store')->name('store');
         Route::post('/create-paymentIntent', 'createPaymentIntent')->name('createPaymentIntent');
         Route::post('/confirm-paymentIntent', 'confirmPaymentIntent')->name('confirmPaymentIntent');
+        Route::post('/confirm-setupIntent', 'confirmSetupIntent')->name('confirmSetupIntent');
         Route::post('/create-donate-history', 'createDonateHistory')->name('createDonateHistory');
+        Route::post('/create-subscription', 'createSubscription')->name('createSubscription');
         Route::get('/3ds', 'threeDS')->name('threeDS');
 
         // For Test

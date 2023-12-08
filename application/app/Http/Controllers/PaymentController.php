@@ -13,6 +13,12 @@ use Illuminate\Http\Response;
 
 class PaymentController extends Controller
 {
+    private $stripe;
+
+    public function __construct(){
+        $this->stripe = new StripeClient(env('STRIPE_SECRET'));
+    }
+
     public function index()
     {
         return view('stripe.index');
@@ -118,37 +124,51 @@ class PaymentController extends Controller
                 ]);
             }
 
-            $paymentMethod = $stripe->paymentMethods->create([
-                'type' => 'card',
-                'card' => [
-                    'token' => $request->stripeToken,
+            // $paymentMethod = $stripe->paymentMethods->create([
+            //     'type' => 'card',
+            //     'card' => [
+            //         'token' => $request->stripeToken,
+            //     ],
+            // ]);
+
+            // $paymentMethod = $stripe->paymentMethods->attach(
+            //     $paymentMethod->id,
+            //     ['customer' => $customer->id]
+            // );
+
+            $setupIntent = $stripe->setupIntents->create([
+                'payment_method_types' => ['card'],
+                'usage' => 'off_session',
+                'customer' => $customer->id,
+                'payment_method_data' => [
+                    'type' => 'card',
+                    'card' => [
+                        'token' => $request->stripeToken,
+                    ],
                 ],
+                'confirm' => true,
+                'return_url' => route('stripe.threeDS', ['type' => 'setupIntent']),
             ]);
 
-            $paymentMethod = $stripe->paymentMethods->attach(
-                $paymentMethod->id,
-                ['customer' => $customer->id]
-            );
+            // $setupIntent = $stripe->setupIntents->confirm($setupIntent->id);
+
+            return json_encode($setupIntent);
+
+            die();
 
             $subscription = $stripe->subscriptions->create([
                 'customer' => $customer->id,
                 'items' => $items,
-                'off_session' => false,
+                'off_session' => true,
                 'payment_behavior' => 'allow_incomplete',
                 'payment_settings' => [
                     'save_default_payment_method' => 'on_subscription'
                 ],
-                'default_payment_method' => $paymentMethod->id,
+                'default_payment_method' => $setupIntent->payment_method,
                 'expand' => ['latest_invoice.payment_intent'],
                 "description" => $request->dedicate_this_donation ? "Double-Time Donate - " . $request->dedicate_this_donation : "Double-Time Donate",
             ]);
-            $paymentIntent = $stripe->paymentIntents->retrieve($subscription->latest_invoice->payment_intent->id);
-            if($paymentIntent->status === 'requires_action'){
-                $paymentIntent->confirm([
-                    'return_url' => route('stripe.threeDS'),
-                ]);
-            }
-            return json_encode($paymentIntent);
+            return json_encode($setupIntent);
         } else {
 
             $paymentIntent = $stripe->paymentIntents->create([
@@ -162,7 +182,7 @@ class PaymentController extends Controller
                         'token' => $request->stripeToken,  // Card token from your frontend
                     ],
                 ],
-                'return_url' => route('stripe.threeDS'),
+                'return_url' => route('stripe.threeDS', ['type' => 'paymentIntent']),
                 'customer' => $customer->id,
                 'description' => $request->dedicate_this_donation ? "One-Time Donate - " . $request->dedicate_this_donation : "One-Time Donate",
             ]);
@@ -173,20 +193,55 @@ class PaymentController extends Controller
 
     function confirmPaymentIntent(Request $request){
         $stripe = new StripeClient(env('STRIPE_SECRET'));
-        $stripe->paymentIntents->confirm($request->paymentIntentId,
-        [
-            'return_url' => route('stripe.index'),
-        ]);
+        $stripe->paymentIntents->confirm($request->paymentIntentId);
         $paymentIntent = $stripe->paymentIntents->retrieve($request->paymentIntentId);
-        if(!is_null($paymentIntent->invoice)){
-            $invoice = $stripe->invoices->retrieve($paymentIntent->invoice);
-            if(!is_null($invoice->subscription)){
-                $stripe->subscriptions->update($invoice->subscription, ['off_session' => true]);
-            }
-        }
         return json_encode($paymentIntent);
     }
 
+    function confirmSetupIntent(Request $request){
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
+        $stripe->setupIntents->confirm($request->setupIntentId);
+        $setupIntent = $stripe->setupIntents->retrieve($request->setupIntentId);
+        return json_encode($setupIntent);
+    }
+
+    function createSubscription(Request $request){
+        $products = $this->stripe->products->all();
+        $priceIds = [];
+        foreach($products as $product ){
+            $priceIds[$product->name] = $product->default_price;
+        }
+
+        $items = [];
+        foreach ($request->donates as $donate) {
+            array_push($items, [
+                'price' => $priceIds[$donate['donate_name']],
+                'quantity' => intval($donate['donate_count'])
+            ]);
+        }
+
+        $setupIntent = $this->stripe->setupIntents->retrieve($request->setup_intent_id);
+        $subscription =  $this->stripe->subscriptions->create([
+            'customer' => $setupIntent->customer,
+            'items' => $items,
+            'off_session' => true,
+            // 'payment_behavior' => 'default_incomplete',
+            // 'payment_settings' => [
+            //     'save_default_payment_method' => 'on_subscription'
+            // ],
+            'default_payment_method' => $setupIntent->payment_method,
+            // 'expand' => ['latest_invoice.payment_intent'],
+            "description" => $request->dedicate_this_donation ? "Double-Time Donate - " . $request->dedicate_this_donation : "Double-Time Donate",
+        ]);
+
+        // Retrieve the PaymentIntent from the latest invoice
+        $paymentIntent = $this->stripe->invoices->retrieve(
+            $subscription->latest_invoice->id,
+            ['expand' => ['payment_intent']]
+        )->payment_intent;
+        $paymentIntent = $this->stripe->paymentIntents->confirm($paymentIntent->id);
+        echo json_encode($paymentIntent);
+    }
     function createDonateHistory(Request $request){
         $validate = Validator::make($request->all(), [
             'first_name' => ['required', 'max:255'],
