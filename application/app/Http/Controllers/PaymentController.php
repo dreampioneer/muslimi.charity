@@ -136,7 +136,8 @@ class PaymentController extends Controller
                 'off_session' => false,
                 'payment_behavior' => 'allow_incomplete',
                 'payment_settings' => [
-                    'save_default_payment_method' => 'on_subscription'
+                    // 'payment_method_types' => ['card'],
+                    'save_default_payment_method' => 'on_subscription',
                 ],
                 'default_payment_method' => $paymentMethod->id,
                 'expand' => ['latest_invoice.payment_intent'],
@@ -173,15 +174,16 @@ class PaymentController extends Controller
 
     function confirmPaymentIntent(Request $request){
         $stripe = new StripeClient(env('STRIPE_SECRET'));
-        $stripe->paymentIntents->confirm($request->paymentIntentId,
-        [
-            'return_url' => route('stripe.index'),
-        ]);
+        $stripe->paymentIntents->confirm($request->paymentIntentId);
         $paymentIntent = $stripe->paymentIntents->retrieve($request->paymentIntentId);
         if(!is_null($paymentIntent->invoice)){
             $invoice = $stripe->invoices->retrieve($paymentIntent->invoice);
             if(!is_null($invoice->subscription)){
-                $stripe->subscriptions->update($invoice->subscription, ['off_session' => true]);
+                $stripe->subscriptions->update($invoice->subscription,
+                [
+                    'collection_method' => 'send_invoice',
+                    'off_session' => true
+                ]);
             }
         }
         return json_encode($paymentIntent);
