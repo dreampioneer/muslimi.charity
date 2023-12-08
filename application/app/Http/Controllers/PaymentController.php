@@ -173,10 +173,7 @@ class PaymentController extends Controller
 
     function confirmPaymentIntent(Request $request){
         $stripe = new StripeClient(env('STRIPE_SECRET'));
-        $stripe->paymentIntents->confirm($request->paymentIntentId,
-        [
-            'return_url' => route('stripe.index'),
-        ]);
+        $stripe->paymentIntents->confirm($request->paymentIntentId);
         $paymentIntent = $stripe->paymentIntents->retrieve($request->paymentIntentId);
         return json_encode($paymentIntent);
     }
