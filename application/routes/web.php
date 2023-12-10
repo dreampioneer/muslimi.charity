@@ -36,6 +36,7 @@ Route::name('stripe.')
         Route::post('/create-paymentIntent', 'createPaymentIntent')->name('createPaymentIntent');
         Route::post('/confirm-paymentIntent', 'confirmPaymentIntent')->name('confirmPaymentIntent');
         Route::post('/create-donate-history', 'createDonateHistory')->name('createDonateHistory');
+        Route::post('/webhook', 'webHook')->name('webHook');
         Route::get('/3ds', 'threeDS')->name('threeDS');
 
         // For Test

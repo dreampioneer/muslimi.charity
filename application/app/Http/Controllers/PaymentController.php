@@ -352,4 +352,8 @@ class PaymentController extends Controller
     public function threeDS(){
         return view('stripe.3ds');
     }
+
+    public function webHook(){
+
+    }
 }
