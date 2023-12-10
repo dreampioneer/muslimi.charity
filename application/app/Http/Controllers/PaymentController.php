@@ -10,7 +10,7 @@ use Stripe\Exception\CardException;
 use Stripe\StripeClient;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Log;
 class PaymentController extends Controller
 {
     public function index()
@@ -147,6 +147,11 @@ class PaymentController extends Controller
             if($paymentIntent->status === 'requires_action'){
                 $paymentIntent->confirm([
                     'return_url' => route('stripe.threeDS'),
+                ]);
+                $stripe->subscriptions->update($subscription->id,
+                [
+                    'collection_method' => 'send_invoice',
+                    'days_until_due' => 30
                 ]);
             }
             return json_encode($paymentIntent);
@@ -362,5 +367,50 @@ class PaymentController extends Controller
 
     public function threeDS(){
         return view('stripe.3ds');
+    }
+
+    public function webHook(Request $request){
+        $payload = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature');
+        $endpointSecret = env('STRIPE_WEBHOOK');
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload, $sigHeader, $endpointSecret
+            );
+        } catch (\UnexpectedValueException $e) {
+            // Invalid payload
+            return response()->json(['error' => 'Invalid payload'], 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            // Invalid signature
+            return response()->json(['error' => 'Invalid signature'], 400);
+        }
+
+        $this->handleStripeEvent($event);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function handleStripeEvent($event){
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
+        switch ($event->type) {
+            case 'invoice.paid':
+                $invoice = $event->data->object;
+                // $stripe->invoices->sendInvoice($invoice->id, []);
+                Log::info('Invoice {id} is paid. \r\n Detail: {data} \r\n', ['id' => $invoice->id, 'data' => json_encode($invoice)]);
+                break;
+            case 'invoice.payment_action_required':
+                $invoice = $event->data->object;
+                // $stripe->invoices->update($invoice->id, [
+                //     'collection_method' => 'send_invoice'
+                // ]);
+                // $stripe->invoices->sendInvoice($invoice->id, []);
+                Log::info('Invoice {id} required payment. \r\n Detail: {data}', ['id' => $invoice->id, 'data' => json_encode($invoice)]);
+                break;
+            case 'invoice.sent':
+                $invoice = $event->data->object;
+                Log::info('Invoice {id} is sent.', ['id' => $invoice->id]);
+            default:
+                echo 'Received unknown event type ' . $event->type;
+        }
     }
 }
