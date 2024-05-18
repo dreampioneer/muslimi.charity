@@ -36,8 +36,7 @@
                                     </div>
                                 </div>
                                 <div class="donation-amount">
-                                    <p class="fs-4 m-0 text-primary"><b>{{ number_format($donate->price, 2, '.', ',') }} €
-                                            (Euro)</b></p>
+                                    <p class="fs-4 m-0 text-primary"><b>$&nbsp;{{ number_format($donate->price, 2, '.', ',') }}</b></p>
                                 </div>
                             </div>
                         </div>
@@ -46,48 +45,48 @@
                 @php
                     $donateFoods = [
                         [
-                            'priceId' => 'price_1OAvfgCJAyesaXH9OhRu0Dej',
+                            'priceId' => 'price_1PGAC3CJAyesaXH903RcZSX1',
                             'donate_name' => "Supply a family with a month's supply of Hot Meals",
                             'amount' => 56,
                         ],
                         [
-                            'priceId' => 'price_1OAvfwCJAyesaXH9eytfjz4b',
+                            'priceId' => 'price_1PGACQCJAyesaXH95gw5y3oB',
                             'donate_name' => "Supply 2 families with a month's supply of Hot Meals",
                             'amount' => 112,
                         ],
                         [
-                            'priceId' => 'price_1OAvgDCJAyesaXH92YF54Gi2',
+                            'priceId' => 'price_1PGADHCJAyesaXH9eCyOmyWi',
                             'donate_name' => "Supply 5 families with a month's supply of Hot Meals",
                             'amount' => 280,
                         ],
                         [
-                            'priceId' => 'price_1OAoEWCJAyesaXH9JerRyR1b',
+                            'priceId' => 'price_1PGADhCJAyesaXH9h5Vq2Emy',
                             'donate_name' => "Supply 10 families with a month's supply of Hot Meals",
                             'amount' => 560,
                         ],
                         [
-                            'priceId' => 'price_1OAvgoCJAyesaXH91fXJGDYz',
+                            'priceId' => 'price_1PGADwCJAyesaXH9jRQEAqC9',
                             'donate_name' => "Supply 20 families with a month's supply of Hot Meals",
                             'amount' => 1120,
                         ],
                     ];
                     $donateMedicalSupplies = [
                         [
-                            'priceId' => 'price_1OAvh3CJAyesaXH9ZFnDI3J1',
+                            'priceId' => 'price_1PGAERCJAyesaXH9tVHavzA7',
                             'donate_name' => 'Emergency Medical Supplies to Hospitals',
                             'amount' => 200,
                         ],
                     ];
                     $donateShelter = [
                         [
-                            'priceId' => 'price_1OAvhgCJAyesaXH9OO9kkC8a',
+                            'priceId' => 'price_1PGAEgCJAyesaXH9mUMlOrFE',
                             'donate_name' => 'Emergency Shelter',
                             'amount' => 500,
                         ],
                     ];
                     $donateAidCombo = [
                         [
-                            'priceId' => 'price_1OAvhuCJAyesaXH93yooc4hs',
+                            'priceId' => 'price_1PGAExCJAyesaXH9bjKSEmZJ',
                             'donate_name' => 'Emergency Aid Combo (Meals, Water, Aid, Shelter)',
                             'amount' => 1000,
                         ],
@@ -146,8 +145,7 @@
                                                             name="{{ $donate['class'] }}_radio"
                                                             data-price-id="{{ $donateItem['priceId'] }}"
                                                             data-name="{{ $donateItem['donate_name'] }}"
-                                                            data-amount="{{ $donateItem['amount'] }}">&nbsp;&nbsp;{{ number_format($donateItem['amount'], 2, '.', ',') }}
-                                                        € (Euro)
+                                                            data-amount="{{ $donateItem['amount'] }}">&nbsp;$&nbsp;{{ number_format($donateItem['amount'], 2, '.', ',') }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-8">
@@ -416,10 +414,10 @@
                     '<p class="my-auto">' + donates[i]['donate_name'] + '</p>' +
                     '</div>' +
                     '<div class="col-md-1 d-flex p-0">' +
-                    '<p class="my-auto">' + parseFloat(donates[i]['donate_amount']).toLocaleString('en-US', {
+                    '<p class="my-auto">$&nbsp;' + parseFloat(donates[i]['donate_amount']).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
-                    }) + ' € (Euro)</p>' +
+                    }) + '</p>' +
                     '</div>' +
                     '<div class="col-md-3 d-flex ps-36">' +
                     '<div class="input-group my-auto">' +
@@ -434,12 +432,12 @@
                     '</div>' +
                     '</div>' +
                     '<div class="col-md-2 d-flex">' +
-                    '<p class="my-auto w-p100 fw-semibold text-right total-' + i + '">' + (parseFloat(donates[i][
+                    '<p class="my-auto w-p100 fw-semibold text-right total-' + i + '">$&nbsp' + (parseFloat(donates[i][
                         'donate_amount'
                     ]) * parseInt(donates[i]['donate_count'])).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
-                    }) + ' € (Euro)</p>' +
+                    }) + '</p>' +
                     '</div>' +
                     '</div>';
             }
@@ -448,10 +446,10 @@
                 '<h5 class="fw-semibold">Total</h5>' +
                 '</div>' +
                 '<div class="col-md-4">' +
-                '<h5 class="total text-right fw-semibold">' + totalAmount.toLocaleString('en-US', {
+                '<h5 class="total text-right fw-semibold">$&nbsp;' + totalAmount.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                }) + ' € (Euro)</h5>' +
+                }) + '</h5>' +
                 '</div>' +
                 '</div>';
             $(".donate-detail").html(html);
@@ -496,7 +494,7 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            $('.total-' + index).text(subTotal + " € (Euro)");
+            $('.total-' + index).text("$ " + subTotal);
             donates[index]['donate_count'] = value;
             let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(
                 item['donate_amount']), 0);
@@ -504,7 +502,7 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            $('.total').text(totalAmount + " € (Euro)");
+            $('.total').text("$&nbsp" + totalAmount);
         });
 
         $(".donate-div").on('click', '.btn-add', function() {
@@ -520,7 +518,7 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            $('.total-' + index).text(subTotal + " € (Euro)");
+            $('.total-' + index).text("$ " + subTotal);
             donates[index]['donate_count'] = value;
             let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) * parseFloat(
                 item['donate_amount']), 0);
@@ -528,7 +526,7 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            $('.total').text(totalAmount + " € (Euro)");
+            $('.total').text("$ " + totalAmount);
         })
 
         $(".donate-div").on('click', '.btn-sub', function() {
@@ -545,7 +543,7 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                $('.total-' + index).text(subTotal + " € (Euro)");
+                $('.total-' + index).text("$nbsp;" + subTotal);
                 donates[index]['donate_count'] = value;
                 let totalAmount = donates.reduce((total, item) => total + parseInt(item['donate_count']) *
                     parseFloat(item['donate_amount']), 0);
@@ -553,7 +551,7 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                $('.total').text(totalAmount + " € (Euro)");
+                $('.total').text("$ " + totalAmount);
             }
         })
 

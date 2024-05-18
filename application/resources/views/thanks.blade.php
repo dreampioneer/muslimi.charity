@@ -28,7 +28,7 @@
                             <h5 class="mb-0">{{ number_format(intval($item->donate_count), 0, '', ',') }}</h5>
                         </div>
                         <div class="col-md-2 text-right my-auto">
-                            <h5 class="mb-0">{{ number_format(floatval($item->donate_amount) * intval($item->donate_count), 2, ',', ',') }} € (Euro)</h5>
+                            <h5 class="mb-0">$ {{ number_format(floatval($item->donate_amount) * intval($item->donate_count), 2, ',', ',') }}</h5>
                         </div>
                         @php
                             $total = $total + floatval($item->donate_amount) * intval($item->donate_count);
@@ -40,7 +40,7 @@
                         <h4 class="fw-bold mb-0">Total</h4>
                     </div>
                     <div class="col-md-4 text-right">
-                        <h4 class="fw-bold mb-0">{{ number_format($total, 2, '.', ',') }} € (Euro)</h4>
+                        <h4 class="fw-bold mb-0">$ {{ number_format($total, 2, '.', ',') }}</h4>
                     </div>
                 </div>
                 <div class="text-center">
